@@ -14,18 +14,17 @@ body {
 }
 
 #time {
-  font-size: 150px;
-  margin-bottom: 8px;
+  font-size: 140px;
 }
 
 #date {
-  font-size: 15px;
+  font-size: 10px;
    text-align: end;
 
 }
 
 .card {
-  height: 250px;
+  height: 230px;
   align-items: center;
   justify-content: center;
   gap: 10px;
