@@ -14,26 +14,15 @@ body {
 }
 
 #time {
-  font-size: 180px;
-  background: linear-gradient(45deg, 
-    #00aaff, 
-    #0066ff, 
-    #0011ff, 
-    #4b0082, 
-    #800080, 
-    #b200ff, 
-    #ee82ee, 
-    #9400d3, 
-    #8a2be2, 
-    #6a5acd, 
-    #7b68ee, 
-    #483d8b);
+  font-size: 200px;
+  background-image: url('img.jpg'); /* Ruta de la imagen */
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
+
 #date {
-  font-size: 30px;
+  font-size: 40px;
   text-align: end;
   font-family: ui-monospace;
   font-weight: bold; /* Add the desired font-weight value */
