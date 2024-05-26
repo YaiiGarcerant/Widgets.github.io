@@ -14,7 +14,7 @@ body {
 }
 
 #time {
-  font-size: 150px;
+  font-size: 140px;
   background-image: url('img.jpg'); /* Ruta de la imagen */
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -22,7 +22,7 @@ body {
 
 
 #date {
-  font-size: 40px;
+  font-size: 25px;
   text-align: end;
   font-family: ui-monospace;
   font-weight: bold; /* Add the desired font-weight value */
