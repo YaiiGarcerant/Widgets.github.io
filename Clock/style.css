@@ -14,7 +14,7 @@ body {
 }
 
 #time {
-  font-size: 200px;
+  font-size: 150px;
   background-image: url('img.jpg'); /* Ruta de la imagen */
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
