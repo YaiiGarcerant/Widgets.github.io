@@ -14,24 +14,21 @@ body {
 }
 
 #time {
-  font-size: 140px;
-  background-image: url('img.jpg'); /* Ruta de la imagen */
+  font-size: 180px;
+  background-image: url('img.jpg');
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
-
 #date {
-  font-size: 25px;
+  font-size: 30px;
   text-align: end;
   font-family: ui-monospace;
-  font-weight: bold; /* Add the desired font-weight value */
-  color: #ffffff; /* Set the desired text color */
+  font-weight: bold;
+  color: #ffffff;
 }
 
-
 .card {
-  height: 230px;
   align-items: center;
   justify-content: center;
   gap: 10px;
@@ -43,4 +40,32 @@ body {
   font-weight: 900;
 }
 
+/* Media query para pantallas más pequeñas */
+@media (max-width: 768px) {
+  #time {
+    font-size: 170px;
+  }
 
+  #date {
+    font-size: 20px;
+  }
+
+  .card {
+    padding: 0px 10px;
+  }
+}
+
+/* Media query para pantallas aún más pequeñas */
+@media (max-width: 480px) {
+  #time {
+    font-size: 100px;
+  }
+
+  #date {
+    font-size: 16px;
+  }
+
+  .card {
+    padding: 0px 5px;
+  }
+}
