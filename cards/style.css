@@ -1,0 +1,30 @@
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #191919;
+  
+}
+
+.row {
+  justify-content: center;
+  
+}
+
+.card {
+  border: 1px solid #ddd;
+  color: white;
+  border-radius: 10px;
+  text-align: center;
+  transition: transform 0.3s;
+  width: 60px;
+  height: 60px;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+}
+
