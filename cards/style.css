@@ -35,18 +35,41 @@ background-color: #191919;
   border: #ffcccc 1px solid; /* Light Red */
 }
 
-.card-2 {
-  border: #ccffcc 1px solid; /* Light Green */
+
+.card-1 i{
+  font-size: 30px;
+  color: #ffcccc;
 }
+
+
+.card-2 {
+  border: #ffffcc 1px solid; /* Light Green */
+}
+
+
+
+.card-2 i{
+  font-size: 30px;
+  color: #ffffcc;
+}
+
 
 .card-3 {
   border: #ccccff 1px solid; /* Light Blue */
 }
 
-.card-4 {
-  border: #ffffcc 1px solid; /* Light Yellow */
+
+.card-3 i{
+  font-size: 30px;
+  color: #ccccff;
 }
 
-img{
-  width: 40px;
+
+.card-4 {
+  border: #C0C693 1px solid; /* Light Yellow */
+}
+
+.card-4 i{
+  font-size: 30px;
+  color: #C0C693;
 }
