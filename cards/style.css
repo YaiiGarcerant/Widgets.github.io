@@ -22,9 +22,31 @@ body {
   transition: transform 0.3s;
   width: 60px;
   height: 60px;
+  justify-content: center;
+  align-items: center;
+background-color: #191919;
 }
 
 .card:hover {
   transform: translateY(-5px);
 }
 
+.card-1 {
+  border: #ffcccc 1px solid; /* Light Red */
+}
+
+.card-2 {
+  border: #ccffcc 1px solid; /* Light Green */
+}
+
+.card-3 {
+  border: #ccccff 1px solid; /* Light Blue */
+}
+
+.card-4 {
+  border: #ffffcc 1px solid; /* Light Yellow */
+}
+
+img{
+  width: 40px;
+}
