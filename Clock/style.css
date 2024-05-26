@@ -15,13 +15,31 @@ body {
 
 #time {
   font-size: 140px;
+  background: linear-gradient(45deg, 
+    #00aaff, 
+    #0066ff, 
+    #0011ff, 
+    #4b0082, 
+    #800080, 
+    #b200ff, 
+    #ee82ee, 
+    #9400d3, 
+    #8a2be2, 
+    #6a5acd, 
+    #7b68ee, 
+    #483d8b);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 #date {
-  font-size: 10px;
-   text-align: end;
-
+  font-size: 15px;
+  text-align: end;
+  font-family: ui-rounded;
+  font-weight: normal; /* Add the desired font-weight value */
+  color: #ffffff; /* Set the desired text color */
 }
+
 
 .card {
   height: 230px;
@@ -29,47 +47,11 @@ body {
   justify-content: center;
   gap: 10px;
   padding: 0px 15px;
-  background-color: red;
   border-radius: 10px;
-  border: none;
   color: white;
   position: relative;
   cursor: pointer;
   font-weight: 900;
-  transition-duration: .2s;
-  background: linear-gradient(0deg, #000, #272727);
 }
 
-.card:before, .card:after {
-  content: '';
-  position: absolute;
-  left: -2px;
-  top: -2px;
-  border-radius: 10px;
-  background: linear-gradient(45deg, #fb0094, #0000ff, #00ff00,#ffff00, #ff0000, #fb0094, 
-    #0000ff, #00ff00,#ffff00, #ff0000);
-  background-size: 400%;
-  width: calc(100% + 4px);
-  height: calc(100% + 4px);
-  z-index: -1;
-  animation: steam 50s linear infinite;
-}
-
-@keyframes steam {
-  0% {
-    background-position: 0 0;
-  }
-
-  50% {
-    background-position: 400% 0;
-  }
-
-  100% {
-    background-position: 0 0;
-  }
-}
-
-.card:after {
-  filter: blur(100px);
-}
 
