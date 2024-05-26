@@ -14,7 +14,7 @@ body {
 }
 
 #time {
-  font-size: 140px;
+  font-size: 180px;
   background: linear-gradient(45deg, 
     #00aaff, 
     #0066ff, 
@@ -33,10 +33,10 @@ body {
 }
 
 #date {
-  font-size: 15px;
+  font-size: 30px;
   text-align: end;
-  font-family: ui-rounded;
-  font-weight: normal; /* Add the desired font-weight value */
+  font-family: ui-monospace;
+  font-weight: bold; /* Add the desired font-weight value */
   color: #ffffff; /* Set the desired text color */
 }
 
