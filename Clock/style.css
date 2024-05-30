@@ -43,7 +43,7 @@ body {
 /* Media query para pantallas más pequeñas */
 @media (max-width: 768px) {
   #time {
-    font-size: 170px;
+    font-size: 120px;
   }
 
   #date {
@@ -58,7 +58,7 @@ body {
 /* Media query para pantallas aún más pequeñas */
 @media (max-width: 480px) {
   #time {
-    font-size: 100px;
+    font-size: 80px;
   }
 
   #date {
