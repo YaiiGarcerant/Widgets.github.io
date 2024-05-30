@@ -14,14 +14,14 @@ body {
 }
 
 #time {
-  font-size: 180px;
+  font-size: 130px;
   background-image: url('img.jpg');
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
 #date {
-  font-size: 30px;
+  font-size: 20px;
   text-align: end;
   font-family: ui-monospace;
   font-weight: bold;
