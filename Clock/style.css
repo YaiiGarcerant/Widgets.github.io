@@ -14,7 +14,7 @@ body {
 }
 
 #time {
-  font-size: 150px;
+  font-size: 130px;
   background-image: url('img.jpg');
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -43,7 +43,7 @@ body {
 /* Media query para pantallas más pequeñas */
 @media (max-width: 768px) {
   #time {
-    font-size: 140px;
+    font-size: 120px;
   }
 
   #date {
@@ -58,7 +58,7 @@ body {
 /* Media query para pantallas aún más pequeñas */
 @media (max-width: 480px) {
   #time {
-    font-size: 100px;
+    font-size: 90px;
   }
 
   #date {
