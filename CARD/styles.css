@@ -1,0 +1,59 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  overflow: hidden; /* 🔴 NO SCROLL */
+  font-family: Arial, sans-serif;
+}
+
+body {
+  touch-action: pan-y; /* bloquea pan-x nativo */
+}
+
+
+
+/* Banner fijo */
+.banner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 70px;
+  width: 100%;
+  background: #111;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+/* Contenedor horizontal */
+#wrapper {
+  position: absolute;
+  top: 70px; /* altura del banner */
+  left: 0;
+  height: calc(100vh - 70px);
+  width: 400vw; /* 4 secciones */
+  display: flex;
+  transition: transform 0.8s ease;
+}
+
+/* Secciones */
+.panel {
+  width: 100vw;
+  height: calc(100vh - 70px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+  color: white;
+}
+
+.panel-1 { background: #ff595e; }
+.panel-2 { background: #1982c4; }
+.panel-3 { background: #6a4c93; }
+.panel-4 { background: #8ac926; }
