@@ -1,5 +1,6 @@
 const wrapper = document.getElementById('wrapper');
 const panels = document.querySelectorAll('.panel');
+const banner = document.getElementById('banner');
 
 let currentIndex = 0;
 let locked = false;
@@ -9,7 +10,20 @@ const SWIPE_THRESHOLD = 60;
 let startX = 0;
 let startY = 0;
 
-/* Movimiento único */
+/* Actualizar estado visual */
+function updateLayout() {
+  if (currentIndex === 0) {
+    banner.classList.add('hidden');
+    panels.forEach(p => p.classList.remove('with-banner'));
+  } else {
+    banner.classList.remove('hidden');
+    panels.forEach((p, i) => {
+      if (i > 0) p.classList.add('with-banner');
+    });
+  }
+}
+
+/* Movimiento 1 sección */
 function move(direction) {
   if (locked) return;
 
@@ -20,38 +34,36 @@ function move(direction) {
   currentIndex = next;
 
   wrapper.style.transform = `translateX(-${currentIndex * 100}vw)`;
+  updateLayout();
 
-  setTimeout(() => {
-    locked = false;
-  }, ANIMATION_TIME);
+  setTimeout(() => locked = false, ANIMATION_TIME);
 }
 
-/* 🧠 POINTER EVENTS = UN SOLO SISTEMA */
-window.addEventListener('pointerdown', (e) => {
+/* Pointer events */
+window.addEventListener('pointerdown', e => {
   if (locked) return;
-
   startX = e.clientX;
   startY = e.clientY;
 });
 
-window.addEventListener('pointerup', (e) => {
+window.addEventListener('pointerup', e => {
   if (locked) return;
 
   const diffX = startX - e.clientX;
   const diffY = startY - e.clientY;
 
-  // SOLO horizontal
   if (Math.abs(diffX) <= Math.abs(diffY)) return;
   if (Math.abs(diffX) < SWIPE_THRESHOLD) return;
 
   move(diffX > 0 ? 1 : -1);
 });
 
-/* ⛔ Bloqueo total del wheel (trackpad inercia) */
+/* Bloqueo total del scroll */
 window.addEventListener(
   'wheel',
-  (e) => {
-    e.preventDefault();
-  },
+  e => e.preventDefault(),
   { passive: false }
 );
+
+/* Inicial */
+updateLayout();
