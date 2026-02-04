@@ -10,13 +10,13 @@ const SWIPE_THRESHOLD = 60;
 let startX = 0;
 let startY = 0;
 
-/* Actualizar estado visual */
+/* Sincronizar layout */
 function updateLayout() {
   if (currentIndex === 0) {
-    banner.classList.add('hidden');
+    banner.classList.remove('visible');
     panels.forEach(p => p.classList.remove('with-banner'));
   } else {
-    banner.classList.remove('hidden');
+    banner.classList.add('visible');
     panels.forEach((p, i) => {
       if (i > 0) p.classList.add('with-banner');
     });
@@ -33,8 +33,9 @@ function move(direction) {
   locked = true;
   currentIndex = next;
 
-  wrapper.style.transform = `translateX(-${currentIndex * 100}vw)`;
+  // 🔥 TODO se mueve junto
   updateLayout();
+  wrapper.style.transform = `translateX(-${currentIndex * 100}vw)`;
 
   setTimeout(() => locked = false, ANIMATION_TIME);
 }
@@ -58,12 +59,12 @@ window.addEventListener('pointerup', e => {
   move(diffX > 0 ? 1 : -1);
 });
 
-/* Bloqueo total del scroll */
+/* Bloqueo scroll */
 window.addEventListener(
   'wheel',
   e => e.preventDefault(),
   { passive: false }
 );
 
-/* Inicial */
+/* Init */
 updateLayout();

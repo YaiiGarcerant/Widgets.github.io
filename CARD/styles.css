@@ -71,3 +71,53 @@ body {
   padding-top: 70px;
   height: calc(100vh - 70px);
 }
+
+
+/* Banner SIEMPRE presente */
+.banner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 70px;
+  width: 100%;
+  background: #111;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+
+  /* 🔑 empieza oculto fuera de pantalla */
+  transform: translateY(-100%);
+  transition: transform 0.8s ease;
+}
+
+/* Banner visible */
+.banner.visible {
+  transform: translateY(0);
+}
+
+/* Wrapper siempre deja espacio para banner */
+#wrapper {
+  display: flex;
+  height: 100vh;
+  width: 400vw;
+  transition: transform 0.8s ease;
+}
+
+/* Secciones */
+.panel {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+  color: white;
+}
+
+/* Desde sección 2 el contenido baja */
+.with-banner {
+  padding-top: 70px;
+  height: calc(100vh - 70px);
+}
