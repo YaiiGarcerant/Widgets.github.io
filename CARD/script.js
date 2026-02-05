@@ -4,7 +4,7 @@ const banner = document.getElementById('banner');
 
 let currentIndex = 0;
 let locked = false;
-const ANIMATION_TIME = 800;
+const ANIMATION_TIME = .8;
 const SWIPE_THRESHOLD = 60;
 
 let startX = 0;
