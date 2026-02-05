@@ -7,7 +7,7 @@ const progressBar = document.getElementById('progress-bar');
 let currentIndex = 0;
 let locked = false;
 
-const ANIMATION_TIME = .5;
+const ANIMATION_TIME = 500;
 const SWIPE_THRESHOLD = 60;
 
 let startX = 0;
@@ -24,26 +24,30 @@ panels.forEach(() => {
 
 const steps = document.querySelectorAll('.progress-step');
 
-
+const root = document.documentElement;
 
 function updateLayout() {
+  // Progreso segmentado
   steps.forEach((step, i) => {
     step.classList.toggle('active', i === currentIndex);
   });
 
   if (currentIndex === 0) {
-    banner.classList.remove('visible');
-    progressWrapper.classList.remove('below-banner');
+    // Banner fuera + progress arriba
+    root.style.setProperty('--banner-y', '-100%');
+    root.style.setProperty('--progress-y', '0px');
+
     panels.forEach(p => p.classList.remove('with-banner'));
   } else {
-    banner.classList.add('visible');
-    progressWrapper.classList.add('below-banner');
+    // Banner entra + progress se desliza debajo
+    root.style.setProperty('--banner-y', '0px');
+    root.style.setProperty('--progress-y', '70px');
+
     panels.forEach((p, i) => {
       if (i > 0) p.classList.add('with-banner');
     });
   }
 }
-
 
 
 /* Movimiento controlado */
