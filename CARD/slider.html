@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Secciones + Barra de Progreso</title>
+
+    <style>
+        /* RESET */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: sans-serif;
+        }
+
+        /* CONTENEDOR GENERAL */
+        .wrapper {
+            width: 100%;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* SECCIONES HORIZONTALES */
+        .sections {
+            display: flex;
+            transition: transform 0.6s ease-in-out;
+            width: 100%;
+        }
+
+        .section {
+            min-width: 100%;
+            height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            font-weight: bold;
+            color: white;
+        }
+
+        /* Colores demo */
+        .section:nth-child(1) {
+            background: #111;
+        }
+
+        .section:nth-child(2) {
+            background: #1e293b;
+        }
+
+        .section:nth-child(3) {
+            background: #334155;
+        }
+
+        .section:nth-child(4) {
+            background: #475569;
+        }
+
+        .section:nth-child(5) {
+            background: #64748b;
+        }
+
+        /* BARRA PROGRESO */
+        .progress-wrapper {
+            width: 100%;
+            height: 6px;
+            background: rgba(28, 25, 23, 0.4);
+            position: relative;
+            overflow: hidden;
+            border-radius: 999px;
+            margin-top: 10px;
+        }
+
+        #progress-indicator {
+            position: absolute;
+            top: 0;
+            height: 100%;
+            background: #d10707;
+            transition: all 0.5s ease-in-out;
+            border-radius: 999px;
+            opacity: 0;
+        }
+
+        /* BOTONES */
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 18px;
+            border: none;
+            border-radius: 6px;
+            background: black;
+            color: white;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #333;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="wrapper" id="wrapper">
+        <div class="sections" id="sections">
+            <div class="section">1</div>
+            <div class="section">2</div>
+            <div class="section">3</div>
+            <div class="section">4</div>
+            <div class="section">5</div>
+        </div>
+    </div>
+
+    <!-- Barra de progreso -->
+    <div class="progress-wrapper">
+        <div id="progress-indicator"></div>
+    </div>
+
+    <!-- Botones -->
+    <div class="controls">
+        <button onclick="prev()">⬅ Prev</button>
+        <button onclick="next()">Next ➡</button>
+    </div>
+
+    <script>
+        const sections = document.getElementById("sections");
+        const indicator = document.getElementById("progress-indicator");
+        const totalItems = document.querySelectorAll(".section").length;
+
+        let currentIndex = 0;
+        let startX = 0;
+        let isDragging = false;
+
+        function updateProgress() {
+        const width = 100 / totalItems;
+        const left = width * currentIndex;
+
+        indicator.style.opacity = "1";
+        indicator.style.width = width + "%";
+        indicator.style.left = left + "%";
+
+        sections.style.transform = `translateX(-${currentIndex * 100}%)`;
+        }
+
+
+        /* Navegación */
+        function next() {
+            if (currentIndex < totalItems - 1) {
+                currentIndex++;
+                updateProgress();
+            }
+        }
+
+        function prev() {
+            if (currentIndex > 0) {
+                currentIndex--;
+                updateProgress();
+            }
+        }
+
+        /* Swipe Touch + Mouse */
+        const wrapper = document.getElementById("wrapper");
+
+        wrapper.addEventListener("touchstart", e => {
+            startX = e.touches[0].clientX;
+            isDragging = true;
+        });
+
+        wrapper.addEventListener("touchend", e => {
+            if (!isDragging) return;
+            const endX = e.changedTouches[0].clientX;
+            handleSwipe(endX - startX);
+            isDragging = false;
+        });
+
+        wrapper.addEventListener("mousedown", e => {
+            startX = e.clientX;
+            isDragging = true;
+        });
+
+        wrapper.addEventListener("mouseup", e => {
+            if (!isDragging) return;
+            handleSwipe(e.clientX - startX);
+            isDragging = false;
+        });
+
+        /* Detectar dirección */
+        function handleSwipe(diff) {
+            const threshold = 60;
+            if (diff > threshold) prev();
+            if (diff < -threshold) next();
+        }
+
+        /* Init */
+        updateProgress();
+    </script>
+
+</body>
+
+</html>

@@ -1,8 +1,14 @@
 const wrapper = document.getElementById('wrapper');
 const panels = document.querySelectorAll('.panel');
 const banner = document.getElementById('banner');
-const progressWrapper = document.getElementById('progress-wrapper');
-const progressBar = document.getElementById('progress-bar');
+const indicator = document.getElementById("progress-indicator");
+const totalItems = panels.length;
+
+
+const topUI = document.getElementById("top-ui");
+const bannerEl = document.getElementById("banner");
+
+
 
 let currentIndex = 0;
 let locked = false;
@@ -13,41 +19,31 @@ const SWIPE_THRESHOLD = 60;
 let startX = 0;
 let startY = 0;
 
-const progressSteps = document.getElementById('progress-steps');
-
-/* Crear segmentos */
-panels.forEach(() => {
-  const step = document.createElement('div');
-  step.className = 'progress-step';
-  progressSteps.appendChild(step);
-});
-
-const steps = document.querySelectorAll('.progress-step');
-
 const root = document.documentElement;
 
-function updateLayout() {
-  // Progreso segmentado
-  steps.forEach((step, i) => {
-    step.classList.toggle('active', i === currentIndex);
-  });
+function updateProgress() {
+  const width = 100 / totalItems;
+  const left = width * currentIndex;
 
-  if (currentIndex === 0) {
-    // Banner fuera + progress arriba
-    root.style.setProperty('--banner-y', '-100%');
-    root.style.setProperty('--progress-y', '0px');
-
-    panels.forEach(p => p.classList.remove('with-banner'));
-  } else {
-    // Banner entra + progress se desliza debajo
-    root.style.setProperty('--banner-y', '0px');
-    root.style.setProperty('--progress-y', '70px');
-
-    panels.forEach((p, i) => {
-      if (i > 0) p.classList.add('with-banner');
-    });
-  }
+  indicator.style.opacity = "1";
+  indicator.style.width = width + "%";
+  indicator.style.left = left + "%";
 }
+
+
+function updateLayout() {
+  if (currentIndex === 0) {
+    // banner oculto
+    root.style.setProperty('--banner-y', '-90%');
+  } else {
+    // banner visible
+    root.style.setProperty('--banner-y', '0px');
+  }
+
+  updateProgress();
+}
+
+
 
 
 /* Movimiento controlado */
@@ -66,7 +62,7 @@ function move(direction) {
   setTimeout(() => locked = false, ANIMATION_TIME);
 }
 
-/* Pointer events */
+/* Pointer swipe */
 window.addEventListener('pointerdown', e => {
   if (locked) return;
   startX = e.clientX;
@@ -79,13 +75,14 @@ window.addEventListener('pointerup', e => {
   const diffX = startX - e.clientX;
   const diffY = startY - e.clientY;
 
+  // Solo horizontal
   if (Math.abs(diffX) <= Math.abs(diffY)) return;
   if (Math.abs(diffX) < SWIPE_THRESHOLD) return;
 
   move(diffX > 0 ? 1 : -1);
 });
 
-/* Bloqueo scroll */
+/* Bloquear scroll */
 window.addEventListener(
   'wheel',
   e => e.preventDefault(),

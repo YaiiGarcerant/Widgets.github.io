@@ -4,12 +4,6 @@
   box-sizing: border-box;
 }
 
-
-:root {
-  --banner-y: -100%;
-  --progress-y: 0px;
-}
-
 html,
 body {
   height: 100%;
@@ -21,66 +15,48 @@ body {
   touch-action: pan-y;
 }
 
-/* =========================
-   BANNER
-========================= */
-.banner {
+:root {
+  --banner-y: -90%;
+}
+
+/* Contenedor top */
+#top-ui {
   position: fixed;
   top: 0;
   left: 0;
-  height: 70px;
   width: 100%;
-  background: #111;
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 20;
-
-
-  will-change: transform;
+  z-index: 9999;
   transform: translateY(var(--banner-y));
-  transition: transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: transform 0.4s ease;
 }
 
-.banner.visible {
-  transform: translateY(0);
+/* Banner ocultable */
+#banner {
+  background: black;
+  color: white;
+  padding: 16px;
+  transition: transform 0.4s ease;
 }
 
-/* =========================
-   PROGRESS BAR (SEGMENTADA)
-========================= */
-.progress-wrapper {
-  position: fixed;
-  top: 0;
-  left: 0;
-  height: 6px;
+/* Barra SIEMPRE pegada arriba del top-ui */
+#progress-bar {
+  position: relative; /* contenedor */
+
   width: 100%;
-  z-index: 15;
-  transition: transform 0.8s ease;
-  background: rgba(255, 255, 255, 0.25); /* ⬅️ INACTIVO VISIBLE */
-  will-change: transform;
-  transform: translateY(var(--progress-y));
-  transition: transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+  height: 4px;
+  background: rgba(255, 255, 255, 0.15);
 }
 
-.progress-wrapper.below-banner {
-  transform: translateY(70px);
-}
-
-.progress-steps {
-  display: flex;
-  gap: 6px;
+/* Indicador */
+#progress-indicator {
+  position: absolute; /* ahora left funciona */
+  bottom: 0;
+  left: 0;
   height: 100%;
-}
-
-.progress-step {
-  flex: 1;
-  border-radius: 4px;
-}
-
-.progress-step.active {
-  background: #00f5d4;
+  background: white;
+  transition:
+    width 0.4s ease,
+    left 0.4s ease;
 }
 
 /* =========================
