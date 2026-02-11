@@ -1,93 +1,21 @@
-const wrapper = document.getElementById('wrapper');
-const panels = document.querySelectorAll('.panel');
-const banner = document.getElementById('banner');
-const indicator = document.getElementById("progress-indicator");
-const totalItems = panels.length;
-
-
-const topUI = document.getElementById("top-ui");
-const bannerEl = document.getElementById("banner");
-
-
-
-let currentIndex = 0;
-let locked = false;
-
-const ANIMATION_TIME = 500;
-const SWIPE_THRESHOLD = 60;
-
-let startX = 0;
-let startY = 0;
-
+let i = 0, n = 4, x = 0, y = 0;
 const root = document.documentElement;
 
-function updateProgress() {
-  const width = 100 / totalItems;
-  const left = width * currentIndex;
+const update = () => {
+  root.style.setProperty('--i', i);
+  root.dataset.i = i;
+};
 
-  indicator.style.opacity = "1";
-  indicator.style.width = width + "%";
-  indicator.style.left = left + "%";
-}
+const move = d => {
+  i = Math.max(0, Math.min(n-1, i+d));
+  update();
+};
 
+onpointerdown = e => (x=e.clientX, y=e.clientY);
+onpointerup = e => {
+  const dx = x - e.clientX, dy = y - e.clientY;
+  if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 60)
+    move(dx > 0 ? 1 : -1);
+};
 
-function updateLayout() {
-  if (currentIndex === 0) {
-    // banner oculto
-    root.style.setProperty('--banner-y', '-90%');
-  } else {
-    // banner visible
-    root.style.setProperty('--banner-y', '0px');
-  }
-
-  updateProgress();
-}
-
-
-
-
-/* Movimiento controlado */
-function move(direction) {
-  if (locked) return;
-
-  const next = currentIndex + direction;
-  if (next < 0 || next >= panels.length) return;
-
-  locked = true;
-  currentIndex = next;
-
-  updateLayout();
-  wrapper.style.transform = `translateX(-${currentIndex * 100}vw)`;
-
-  setTimeout(() => locked = false, ANIMATION_TIME);
-}
-
-/* Pointer swipe */
-window.addEventListener('pointerdown', e => {
-  if (locked) return;
-  startX = e.clientX;
-  startY = e.clientY;
-});
-
-window.addEventListener('pointerup', e => {
-  if (locked) return;
-
-  const diffX = startX - e.clientX;
-  const diffY = startY - e.clientY;
-
-  // Solo horizontal
-  if (Math.abs(diffX) <= Math.abs(diffY)) return;
-  if (Math.abs(diffX) < SWIPE_THRESHOLD) return;
-
-  move(diffX > 0 ? 1 : -1);
-});
-
-/* Bloquear scroll */
-window.addEventListener(
-  'wheel',
-  e => e.preventDefault(),
-  { passive: false }
-);
-
-/* Init */
-updateLayout();
+update();

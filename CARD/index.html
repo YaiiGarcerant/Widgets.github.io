@@ -2,35 +2,148 @@
 <html lang="es">
 
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Horizontal Sections Swipe</title>
-  <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Swipe Sections</title>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box
+    }
+
+    html,
+    body {
+      height: 100%;
+      overflow: hidden;
+      font-family: Arial
+    }
+
+    body {
+      touch-action: pan-y
+    }
+
+    :root {
+      --banner-y: -90%
+    }
+
+    /* Top UI */
+    #top-ui {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 10;
+      transform: translateY(var(--banner-y));
+      transition: .4s
+    }
+
+    #banner {
+      background: #000;
+      color: #fff;
+      padding: 16px
+    }
+
+    #progress-bar {
+      height: 4px;
+      background: #ffffff26;
+      position: relative
+    }
+
+    #progress {
+      height: 100%;
+      background: #fff;
+      position: absolute;
+      transition: .4s
+    }
+
+    /* Sections */
+    #wrapper {
+      display: flex;
+      height: 100vh;
+      width: 400vw;
+      transition: .6s
+    }
+
+    .panel {
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 3rem;
+      color: #fff
+    }
+
+    .panel:nth-child(1) {
+      background: #ff595e
+    }
+
+    .panel:nth-child(2) {
+      background: #1982c4
+    }
+
+    .panel:nth-child(3) {
+      background: #6a4c93
+    }
+
+    .panel:nth-child(4) {
+      background: #8ac926
+    }
+  </style>
 </head>
 
 <body>
 
   <div id="top-ui">
-    <div id="banner">
-      Banner content
-    </div>
-
+    <div id="banner">Banner</div>
     <div id="progress-bar">
-      <div id="progress-indicator"></div>
+      <div id="progress"></div>
     </div>
   </div>
 
-
-
-  <!-- Secciones -->
   <div id="wrapper">
-    <section class="panel hero">Sección Principal</section>
-    <section class="panel">Sección 2</section>
-    <section class="panel">Sección 3</section>
-    <section class="panel">Sección 4</section>
+    <section class="panel">Hero</section>
+    <section class="panel">2</section>
+    <section class="panel">3</section>
+    <section class="panel">4</section>
   </div>
 
-  <script src="script.js"></script>
+  <script>
+    const panels = [...document.querySelectorAll(".panel")];
+    const wrap = document.getElementById("wrapper");
+    const progress = document.getElementById("progress");
+    const root = document.documentElement;
+
+    let i = 0, lock = 0, x = 0, y = 0;
+    const TH = 60, T = 500, total = panels.length;
+
+    const update = () => {
+      root.style.setProperty("--banner-y", i ? 0 : "-90%");
+      progress.style.width = 100 / total + "%";
+      progress.style.left = i * (100 / total) + "%";
+      wrap.style.transform = `translateX(-${i * 100}vw)`;
+    };
+
+    const move = d => {
+      if (lock) return;
+      const n = i + d;
+      if (n < 0 || n >= total) return;
+      lock = 1; i = n; update();
+      setTimeout(() => lock = 0, T);
+    };
+
+    addEventListener("pointerdown", e => { x = e.clientX; y = e.clientY });
+    addEventListener("pointerup", e => {
+      const dx = x - e.clientX, dy = y - e.clientY;
+      if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > TH) move(dx > 0 ? 1 : -1);
+    });
+
+    addEventListener("wheel", e => e.preventDefault(), { passive: false });
+
+    update();
+  </script>
+
 </body>
 
 </html>
