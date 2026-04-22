@@ -1,0 +1,983 @@
+<div id="preloader" #preloader>
+  <div class="loading-area">
+    <div class="circle"></div>
+  </div>
+  <div class="left-side"></div>
+  <div class="right-side"></div>
+</div>
+
+
+<!-- TUTORIAL SWIPE SUAVE -->
+<div class="fixed inset-0 z-50 flex items-center justify-center px-6  transition-all duration-500 ease-out" [ngClass]="{ 'opacity-100 pointer-events-auto': showTutorial, 'opacity-0 pointer-events-none': !showTutorial }" (click)="closeTutorial()">
+    <!-- FONDO GRIS OSCURO TRANSLÚCIDO + BLUR -->
+    <div class="absolute inset-0 bg-gray-900/60 backdrop-blur-sm
+           transition-opacity duration-500"></div>
+
+    <!-- CONTENIDO -->
+    <div class="relative z-10 text-center flex flex-col items-center transform transition-all duration-500 ease-out" [ngClass]="{  'translate-y-0 scale-100': showTutorial, 'translate-y-4 scale-95': !showTutorial }">
+        <!-- Flecha curva -->
+        <svg class="swipe-arrow" viewBox="0 0 120 60" fill="none">
+            <defs>
+                <marker id="arrow" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"
+                    markerUnits="strokeWidth">
+                    <path d="M0,0 L6,3 L0,6 Z" fill="white" />
+                </marker>
+            </defs>
+
+            <path d="M100 40 Q60 5 20 35" class="arrow-path" marker-end="url(#arrow)" />
+        </svg>
+
+        <div class="swipe-indicator">
+            <img src="../../../../../../assets/template/icons/hand.png" class="hand-swipe" />
+        </div>
+
+        <!-- TEXTO -->
+        <h2 class="text-lg font-semibold text-gray-200">
+            Desliza a los lados
+        </h2>
+
+        <p class="text-sm text-gray-300 max-w-xs">
+            para explorar todo el contenido
+        </p>
+    </div>
+</div>
+
+
+
+<!-- CONTENEDOR GENERAL -->
+<div class="relative w-full h-screen overflow-hidden bg-white">
+
+    <!-- CONTENEDOR HORIZONTAL -->
+    <div #containerRef id="main" class="absolute left-0 flex w-full overflow-x-auto overflow-y-hidden snap-x snap-mandatory scroll-smooth items-start" [style.height.%]="100" (scroll)="onContainerScroll($event)">
+
+        <!-- SLIDER PRINCIPAL -->
+        <div id="first-slider" class="snap-center shrink-0 w-full h-full overflow-y-auto">
+            <div class="m-auto">
+                <div class="bg-back-one mx-auto grid grid-cols-1 lg:max-w-4xl lg:grid-cols-2 lg:mt-16 content-all border-grey-600 overflow-hidden">
+                    <header class="bg-back-one lg:hidden flex items-center justify-end p-2 z-10 ">
+                        <button type="button" class="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5"
+                            (click)="togglePanel()">
+                            <img src="../../../../../../assets/template/icons/menu.svg" alt="" width="22" />
+                        </button>
+                    </header>
+                
+                    <div #social class="first-child">
+                        <ng-container *ngTemplateOutlet="Card"></ng-container>
+                
+                        <div class="icon-group px-10 mt-8 mx-auto w-full mx-5">
+                            <div class="text-center max-w-screen-lg mx-auto">
+                                <div class="grid grid-cols-4 gap-10">
+                                    <!-- Call -->
+                                    <div class="flex flex-col items-center">
+                                        <img src="../../../../../../assets/template/icons/call-outgoing.svg" alt="Call" class="w-[45px]" />
+                                        <div class="icon-label mt-2 text-sm font-medium text-white">
+                                            <a href="#">Call</a>
+                                        </div>
+                                    </div>
+                
+                                    <!-- Email -->
+                                    <div class="flex flex-col items-center">
+                                        <img src="../../../../../../assets/template/icons/sms-edit.svg" alt="Email" class="w-[45px]" />
+                                        <div class="icon-label mt-2 text-sm font-medium text-white">
+                                            <a href="#">Email</a>
+                                        </div>
+                                    </div>
+                
+                                    <!-- Website -->
+                                    <div class="flex flex-col items-center">
+                                        <img src="../../../../../../assets/template/icons/mouse-circle.svg" alt="Website" class="w-[45px]" />
+                                        <div class="icon-label mt-2 text-sm font-medium text-white">
+                                            <a href="#">Website</a>
+                                        </div>
+                                    </div>
+                
+                                    <!-- Share -->
+                                    <div class="flex flex-col items-center">
+                                        <img src="../../../../../../assets/template/icons/send-2.svg" alt="Share" class="w-[45px]" />
+                                        <div class="icon-label mt-2 text-sm font-medium text-white">
+                                            <a href="#">Share</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                
+                        </div>
+                
+                        <div class="block contact mt-4 lg:hidden">
+                            <main>
+                                    <button #toggleButton (click)="onToggle()">
+                                        <span>Mis Redes Sociales</span>
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48">
+                                            <g class="nc-icon-wrapper" fill="#444444">
+                                                <path d="M14.83 30.83L24 21.66l9.17 9.17L36 28 24 16 12 28z"></path>
+                                            </g>
+                                        </svg>
+                                    </button>
+                            
+                
+                                <div class="title" #titleElement>
+                                    <p>Mis Redes Sociales</p>
+                                </div>
+                            </main>
+                
+                            <nav #navElement class="grid grid-cols-2 gap-4">
+                
+                                <!-- Ítems con íconos sociales -->
+                                <div class=" mt-2 bg-white item ">
+                                    <img src="../../../../../../assets/template/icons/social-media/facebook.svg" alt="Facebook" width="45">
+                                    <div class="item-data">
+                                        <div class="social-title">
+                                            Facebook
+                                        </div>
+                                        <div class="social-data">
+                                            dioestudio
+                                        </div>
+                                    </div>
+                                    <svg class="arrow" xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 48 48">
+                                        <g class="nc-icon-wrapper" fill="#DEDEDE">
+                                            <path d="M17.17 32.92l9.17-9.17-9.17-9.17L20 11.75l12 12-12 12z"></path>
+                                        </g>
+                                    </svg>
+                                </div>
+                
+                                <div class=" mt-2 bg-white item ">
+                                    <img src="../../../../../../assets/template/icons/social-media/instagram.svg" alt="Instagram" width="45">
+                                    <div class="item-data">
+                                        <div class="social-title">
+                                            Instagram
+                                        </div>
+                                        <div class="social-data">
+                                            dioestudio
+                                        </div>
+                                    </div>
+                
+                                    <svg class="arrow" xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 48 48">
+                                        <g class="nc-icon-wrapper" fill="#DEDEDE">
+                                            <path d="M17.17 32.92l9.17-9.17-9.17-9.17L20 11.75l12 12-12 12z"></path>
+                                        </g>
+                                    </svg>
+                                </div>
+                
+                                <div class=" mt-2 bg-white item ">
+                                    <img src="../../../../../../assets/template/icons/social-media/linkedIn.svg" alt="linkedIn" width="42">
+                                    <div class="item-data">
+                                        <div class="social-title">
+                                            LinkedIn
+                                        </div>
+                                        <div class="social-data">
+                                            dioestudio
+                                        </div>
+                                    </div>
+                                    <svg class="arrow" xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 48 48">
+                                        <g class="nc-icon-wrapper" fill="#DEDEDE">
+                                            <path d="M17.17 32.92l9.17-9.17-9.17-9.17L20 11.75l12 12-12 12z"></path>
+                                        </g>
+                                    </svg>
+                                </div>
+                
+                                <div class=" mt-2 bg-white item ">
+                                    <img src="../../../../../../assets/template/icons/social-media/messenger.svg" alt="Messenger" width="42">
+                                    <div class="item-data">
+                                        <div class="social-title">
+                                            Messenger
+                                        </div>
+                                        <div class="social-data">
+                                            dioestudio
+                                        </div>
+                                    </div>
+                                    <svg class="arrow" xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 48 48">
+                                        <g class="nc-icon-wrapper" fill="#DEDEDE">
+                                            <path d="M17.17 32.92l9.17-9.17-9.17-9.17L20 11.75l12 12-12 12z"></path>
+                                        </g>
+                                    </svg>
+                                </div>
+                
+                                <div class=" mt-2 bg-white item ">
+                                    <img src="../../../../../../assets/template/icons/social-media/whatsapp.svg" alt="Whatsapp" width="45">
+                                    <div class="item-data">
+                                        <div class="social-title">
+                                            Whatsapp
+                                        </div>
+                                        <div class="social-data">
+                                            ******2987
+                                        </div>
+                                    </div>
+                                    <svg class="arrow" xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 48 48">
+                                        <g class="nc-icon-wrapper" fill="#DEDEDE">
+                                            <path d="M17.17 32.92l9.17-9.17-9.17-9.17L20 11.75l12 12-12 12z"></path>
+                                        </g>
+                                    </svg>
+                                </div>
+                
+                                <div class=" mt-2 bg-white item ">
+                                    <img src="../../../../../../assets/template/icons/social-media/youtube.svg" alt="Youtube" width="45">
+                                    <div class="item-data">
+                                        <div class="social-title">
+                                            Youtube
+                                        </div>
+                                        <div class="social-data">
+                                            dioestudio
+                                        </div>
+                                    </div>
+                                    <svg class="arrow" xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 48 48">
+                                        <g class="nc-icon-wrapper" fill="#DEDEDE">
+                                            <path d="M17.17 32.92l9.17-9.17-9.17-9.17L20 11.75l12 12-12 12z"></path>
+                                        </g>
+                                    </svg>
+                                </div>
+                
+                
+                
+                            </nav>
+                
+                        </div>
+
+                        <div class="hidden lg:block">
+
+                            <div class="contact">
+                                <div class="grid grid-cols-2 gap-4">
+                    
+                                  
+                                <!-- Ítems con íconos sociales -->
+                                <div class=" mt-2 bg-white item ">
+                                    <img src="../../../../../../assets/template/icons/social-media/facebook.svg" alt="Facebook" width="45">
+                                    <div class="item-data">
+                                        <div class="social-title">
+                                            Facebook
+                                        </div>
+                                        <div class="social-data">
+                                            dioestudio
+                                        </div>
+                                    </div>
+                                    <svg class="arrow" xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 48 48">
+                                        <g class="nc-icon-wrapper" fill="#DEDEDE">
+                                            <path d="M17.17 32.92l9.17-9.17-9.17-9.17L20 11.75l12 12-12 12z"></path>
+                                        </g>
+                                    </svg>
+                                </div>
+                
+                                <div class=" mt-2 bg-white item ">
+                                    <img src="../../../../../../assets/template/icons/social-media/instagram.svg" alt="Instagram" width="45">
+                                    <div class="item-data">
+                                        <div class="social-title">
+                                            Instagram
+                                        </div>
+                                        <div class="social-data">
+                                            dioestudio
+                                        </div>
+                                    </div>
+                
+                                    <svg class="arrow" xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 48 48">
+                                        <g class="nc-icon-wrapper" fill="#DEDEDE">
+                                            <path d="M17.17 32.92l9.17-9.17-9.17-9.17L20 11.75l12 12-12 12z"></path>
+                                        </g>
+                                    </svg>
+                                </div>
+                
+                                <div class=" mt-2 bg-white item ">
+                                    <img src="../../../../../../assets/template/icons/social-media/linkedIn.svg" alt="linkedIn" width="42">
+                                    <div class="item-data">
+                                        <div class="social-title">
+                                            LinkedIn
+                                        </div>
+                                        <div class="social-data">
+                                            dioestudio
+                                        </div>
+                                    </div>
+                                    <svg class="arrow" xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 48 48">
+                                        <g class="nc-icon-wrapper" fill="#DEDEDE">
+                                            <path d="M17.17 32.92l9.17-9.17-9.17-9.17L20 11.75l12 12-12 12z"></path>
+                                        </g>
+                                    </svg>
+                                </div>
+                
+                                <div class=" mt-2 bg-white item ">
+                                    <img src="../../../../../../assets/template/icons/social-media/messenger.svg" alt="Messenger" width="42">
+                                    <div class="item-data">
+                                        <div class="social-title">
+                                            Messenger
+                                        </div>
+                                        <div class="social-data">
+                                            dioestudio
+                                        </div>
+                                    </div>
+                                    <svg class="arrow" xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 48 48">
+                                        <g class="nc-icon-wrapper" fill="#DEDEDE">
+                                            <path d="M17.17 32.92l9.17-9.17-9.17-9.17L20 11.75l12 12-12 12z"></path>
+                                        </g>
+                                    </svg>
+                                </div>
+                
+                                <div class=" mt-2 bg-white item ">
+                                    <img src="../../../../../../assets/template/icons/social-media/whatsapp.svg" alt="Whatsapp" width="45">
+                                    <div class="item-data">
+                                        <div class="social-title">
+                                            Whatsapp
+                                        </div>
+                                        <div class="social-data">
+                                            ******2987
+                                        </div>
+                                    </div>
+                                    <svg class="arrow" xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 48 48">
+                                        <g class="nc-icon-wrapper" fill="#DEDEDE">
+                                            <path d="M17.17 32.92l9.17-9.17-9.17-9.17L20 11.75l12 12-12 12z"></path>
+                                        </g>
+                                    </svg>
+                                </div>
+                
+                                <div class=" mt-2 bg-white item ">
+                                    <img src="../../../../../../assets/template/icons/social-media/youtube.svg" alt="Youtube" width="45">
+                                    <div class="item-data">
+                                        <div class="social-title">
+                                            Youtube
+                                        </div>
+                                        <div class="social-data">
+                                            dioestudio
+                                        </div>
+                                    </div>
+                                    <svg class="arrow" xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 48 48">
+                                        <g class="nc-icon-wrapper" fill="#DEDEDE">
+                                            <path d="M17.17 32.92l9.17-9.17-9.17-9.17L20 11.75l12 12-12 12z"></path>
+                                        </g>
+                                    </svg>
+                                </div>
+
+                                </div>
+                            </div>
+
+
+                            <div class="w-full px-4 py-5 flex justify-center items-center gap-4">
+                                <button type="button" class="btn text-[1.2rem] font-semibold w-[80%] rounded-full bg-[#FFC328] p-2">
+                                    Guardar
+                                </button>
+                                <button type="button" class="btn text-[1.8rem] font-bold rounded-full bg-[#031b32] text-white p-3">
+                                    <img src="../../../../../../assets/template/icons/message.svg" alt="" class="mx-auto" width="25" />
+                                </button>
+                            </div>
+
+                        </div>
+
+                    </div>
+                
+                  
+                
+                </div>
+
+                <div class="block lg:hidden mb-18 py-5">
+                    <div class="pt-6 px-7 pb-6">
+                        <div class="text-xl font-semibold">Sobre Mi</div>
+                        
+                            <p class="read-more-wrap">
+                                Hola! mi nombre es Humberto soy CEO / Director Ejecutivo de de DIO STUDIO,
+                                profesional con más de 15 años de experiencia en Diseño de Marca, más de 15 años de experiencia en Diseño de
+                                <span class="read-more-target" [class.open]="showMore">
+                                    Desarrollo con experiencia, talento y capacidad para crear cualquier proyecto
+                                    de marca, experiencia de usuario o sitio web, con un alto nivel
+                                    de detalle, estético, funcional e impresionante para crear
+                                    experiencias únicas.
+                                </span>
+                            </p>
+                        
+                            <span class="read-more-trigger" (click)="showMore = !showMore">
+                                {{ showMore ? 'Leer menos...' : 'Leer más...' }}
+                            </span>
+                        
+                        
+                    </div>
+
+                    <div class="pt-6 mb-5">
+                        <div class="ps-7 pb-3 text-xl font-semibold">Galería</div>
+                        <div class="carousel-track">
+                            <scrolling-content mobile-speed="40" desktop-speed="60">
+                                <scrolling-track>
+                                    <div *ngFor="let img of images" class="carousel-item">
+                                            <img [src]="img" />
+                                            <div class="overlay"></div>
+                                            <div class="icon">
+                                                <img src="../../../../../../assets/template/icons/photo.svg" width="36" />
+                                            </div>
+                                        </div>
+                                </scrolling-track>
+                            </scrolling-content>
+                        </div>
+                        <a class="ps-6 read-more-trigger block rounded-lg py-2 font-semibold" (click)="toggleGalery()"> <span class="ms-4 text-[18px]">Ver más...</span></a>
+                    </div>
+
+                    <div class="p-7 mx-auto text-center grid grid-cols-3 gap-4" style="margin-bottom: 90px !important;">
+                        <a (click)="goToSlide(1)" class="flex flex-col items-center text-neutral-600 bg-stone-100 rounded-lg p-4 pt-4">
+                            <img src="../../../../../../assets/template/icons/servicios.svg" alt="" width="32">
+                            <span class="mt-4 text-[14px] text-stone-700 font-normal">Servicios</span>
+                        </a>
+                        <a (click)="goToSlide(2)" class="flex flex-col items-center text-neutral-600 bg-stone-100 rounded-lg p-4 pt-4">
+                            <img src="../../../../../../assets/template/icons/galeria.svg" alt="" width="32">
+                            <span class="text-[14px] text-stone-700 font-normal">Galeria</span>
+                        </a>
+                        <a (click)="goToSlide(4)" class="flex flex-col gap-1 items-center text-neutral-600 bg-stone-100 rounded-lg p-4 pt-4">
+                            <img src="../../../../../../assets/template/icons/aliados.svg" alt="" width="42" class="">
+                            <span class="text-[14px] text-stone-700 font-normal">Aliados</span>
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- SLIDER SECUNDARIO 1 -->
+        <div class="snap-center shrink-0 w-full h-full overflow-y-auto sections">
+            <ng-container *ngTemplateOutlet="Banner"></ng-container>
+
+
+            <div class="px-6 mt-2 pb-32 py-6">
+            <div
+                class="mb-3 w-full flex justify-center items-center py-10 bg-white rounded-tl-[30px] rounded-br-[30px] rounded-tr-[10px] rounded-bl-[10px] mt-10">
+                <img src="../../../../../../assets/template/img/logotipo.png" class="w-3xs" />
+            </div>
+            <div class="flex gap-3 whitespace-nowrap mb-8 py-2 pb-6">
+                <a *ngFor="let social of socialIcons" [href]="social.link" target="_blank" rel="noopener noreferrer" [title]="social.name">
+                <img [src]="'../../../../../../assets/template/icons/social-media/white/' + social.icon + '.svg'" [alt]="social.name" class="inline-block" />
+                </a>
+            </div>
+
+            <div class="text-lg font-semibold text-amber-400">Servicios</div>
+
+            <div class="accordion-container mx-auto mt-2 space-y-4 text-white px-2">
+                <div *ngFor="let item of services; let i = index" class="accordion overflow-hidden ">
+                    <div class="accordion-header py-3 flex justify-between items-center cursor-pointer select-none border-b border-stone-400" (click)="toggleAccordion(i)">
+                        <span class="font-semibold">{{ item.title }}</span>
+                        <span class="transition-transform duration-500" [class.rotate-180]="openedIndex === i">  ▾ </span>
+                    </div>
+
+                    <div class="accordion-content transition-all duration-500 ease-in-out overflow-hidden" [style.maxHeight]="openedIndex === i ? '200px' : '0'" [style.opacity]="openedIndex === i ? '1' : '0'">
+                        <div class="px-4 py-2 text-sm">
+                            {{ item.content }}
+                        </div>
+                    
+                        <div  class="w-full overflow-x-auto overflow-y-hidden whitespace-nowrap flex gap-[15px] scroll-smooth [&::-webkit-scrollbar]:hidden scrollbar-none pt-3 ps-6">
+                            <div *ngFor="let img of payments" class="relative w-[100px] h-[100px] bg-[#3333332b] rounded-[10px] shrink-0 overflow-hidden">
+                                <img [src]="img" alt="" class="w-full h-full object-cover block" />    
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="pt-10">
+                <div class="text-lg font-semibold text-amber-400">Name Company</div>
+                <p class="m-0 text-white font-medium text-[14px] leading-[22px] tracking-[0] text-justify font-inter mt-3">
+                Lorem ipsum dolor sit amet consectetur adipisicing elit. Consectetur
+                temporibus sequi tenetur! Nostrum obcaecati sit nihil qui cumque autem
+                nulla sint tenetur repellat, omnis, ad delectus unde ratione numquam
+                blanditiis. Lorem, ipsum dolor sit amet consectetur adipisicing elit.
+                Magni temporibus quasi itaque omnis cupiditate corrupti, aliquam
+                officiis amet laudantium et assumenda reiciendis dolorum consequatur
+                atque molestiae unde consequuntur, necessitatibus alias?
+                </p>
+            </div>
+
+            <div class="pt-4">
+                <div class="text-lg font-semibold text-amber-400">Medios</div>
+                <div class="w-full overflow-x-auto overflow-y-hidden whitespace-nowrap flex gap-[15px] scroll-smooth [&::-webkit-scrollbar]:hidden scrollbar-none pt-3">
+                <div *ngFor="let img of images"
+                    class="relative w-[100px] h-[100px] bg-[#3333332b] rounded-[10px] shrink-0 overflow-hidden">
+                    <img [src]="img" alt="" class="w-full h-full object-cover block" />
+                    <div class="absolute top-0 left-0 w-full h-full bg-[#00000066] z-[1] pointer-events-none"></div>
+                    <div
+                    class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[2] text-white text-[32px] pointer-events-none">
+                    <a href="#" class="mdi mdi-camera-flip-outline"></a>
+                    </div>
+                </div>
+                </div>
+            </div>
+
+            <div class="py-6 mt-10">
+                <div class="text-lg font-semibold text-amber-400">Opciones</div>
+                <div class="grid grid-cols-3 gap-5 mt-3">
+                <a class="flex flex-col items-center bg-transparent text-white border-1 border-stone-300 rounded-lg p-2 py-2" (click)="goToSlide(2)">
+                    <img src="../../../../../../assets/template/icons/white/gallery.svg" alt="" width="35">
+                    <span class="mt-2 text-sm font-medium">Galeria</span>
+                </a>
+                <a class="flex flex-col items-center bg-transparent text-white border-1 border-stone-300 rounded-lg p-2 py-2" (click)="goToSlide(3)">
+                    <img src="../../../../../../assets/template/icons/white/contacto.svg" alt="" width="35">
+                    <span class="mt-2 text-sm font-medium">Contacto</span>
+                </a>
+                <a class="flex flex-col items-center bg-transparent text-white border-1 border-stone-300 rounded-lg p-2 py-2.5" (click)="goToSlide(4)">
+                    <img src="../../../../../../assets/template/icons/white/aliados.svg" alt="" width="45">
+                    <span class="mt-3 text-sm font-medium pt-[6px]">Aliados</span>
+                </a>
+                </div>
+            </div>
+            </div>
+        </div>
+
+        <!-- SLIDER SECUNDARIO 2 -->
+        <div class="snap-center shrink-0 w-full h-full overflow-y-auto sections">
+            <ng-container *ngTemplateOutlet="Banner"></ng-container>
+
+            <div class="px-6 mt-2 pb-32 py-6">
+                <div class="mb-4 w-full flex justify-center border-1 border-transparent border-b-stone-400 py-2">
+                    <div class="text-lg font-semibold text-amber-400">Galeria</div>
+                </div>
+                <div class="w-full grid grid-cols-2 gap-x-4 gap-y-4 pt-3 overflow-hidden pt-4">
+                    <div *ngFor="let img of images" class="relative w-full h-[150px] bg-[#3333332b] rounded-[10px] overflow-hidden">
+                    <img [src]="img" alt="" class="w-full h-full object-cover" />
+
+                    <div class="absolute inset-0 bg-[#00000066] z-[1] pointer-events-none"></div>
+
+                    <div
+                        class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[2] text-white text-[32px] pointer-events-none">
+                        <a href="#" class="mdi mdi-camera-flip-outline"></a>
+                    </div>
+                    </div>
+                </div>
+
+                <div class="py-6 mt-10">
+                    <div class="text-xl font-semibold text-amber-400">Opciones</div>
+                    <div class="grid grid-cols-3 gap-5 mt-3">
+                    <a class="flex flex-col items-center bg-transparent text-white border-1 border-stone-300 rounded-lg p-2 py-2" (click)="goToSlide(1)">
+                        <img src="../../../../../../assets/template/icons/white/servicios.svg" alt="" width="35">
+                        <span class="mt-2 text-sm font-medium">Servicios</span>
+                    </a>
+                    <a class="flex flex-col items-center bg-transparent text-white border-1 border-stone-300 rounded-lg p-2 py-2" (click)="goToSlide(3)">
+                        <img src="../../../../../../assets/template/icons/white/contacto.svg" alt="" width="35">
+                        <span class="mt-2 text-sm font-medium">Contacto</span>
+                    </a>
+                    <a class="flex flex-col items-center bg-transparent text-white border-1 border-stone-300 rounded-lg p-2 py-2.5" (click)="goToSlide(4)">
+                        <img src="../../../../../../assets/template/icons/white/aliados.svg" alt="" width="45">
+                        <span class="mt-3 text-sm font-medium">Aliados</span>
+                    </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDER SECUNDARIO 3 -->
+        <div class="snap-center shrink-0 w-full h-full overflow-y-auto sections">
+            <ng-container *ngTemplateOutlet="Banner"></ng-container>
+        
+            <div class="mt-2 pb-32 px-2 py-6">
+                <div class="px-4 pb-4">
+                    <div class="mb-4 w-full flex justify-center border-1 border-transparent border-b-stone-400 py-2">
+                        <div class="text-lg font-semibold text-amber-400">Contact</div>
+                    </div>
+                </div>
+        
+        
+                <ng-container *ngTemplateOutlet="Card"></ng-container>
+        
+                <div class="px-6 mt-8 py-4">
+                    <div class="text-center max-w-screen-lg mx-auto">
+                        <div class="grid grid-cols-4 gap-10">
+                            <!-- Call -->
+                            <div class="flex flex-col items-center">
+                                <img src="../../../../../../assets/template/icons/call-outgoing.svg" alt="Call"
+                                    class="w-[45px]" />
+                                <div class="icon-label mt-2 text-sm font-medium text-white">
+                                    <a href="#">Call</a>
+                                </div>
+                            </div>
+        
+                            <!-- Email -->
+                            <div class="flex flex-col items-center">
+                                <img src="../../../../../../assets/template/icons/sms-edit.svg" alt="Email" class="w-[45px]" />
+                                <div class="icon-label mt-2 text-sm font-medium text-white">
+                                    <a href="#">Email</a>
+                                </div>
+                            </div>
+        
+                            <!-- Website -->
+                            <div class="flex flex-col items-center">
+                                <img src="../../../../../../assets/template/icons/mouse-circle.svg" alt="Website"
+                                    class="w-[45px]" />
+                                <div class="icon-label mt-2 text-sm font-medium text-white">
+                                    <a href="#">Website</a>
+                                </div>
+                            </div>
+        
+                            <!-- Share -->
+                            <div class="flex flex-col items-center">
+                                <img src="../../../../../../assets/template/icons/send-2.svg" alt="Share" class="w-[45px]" />
+                                <div class="icon-label mt-2 text-sm font-medium text-white">
+                                    <a href="#">Share</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+        
+                <div class="px-6 pt-4 pb-5">
+                    <div class="text-lg font-semibold text-amber-400">Medios de pago</div>
+                    <div class="accordion-container mx-auto mt-2 space-y-4 text-white">
+                        <div *ngFor="let item of items; let i = index"
+                            class="accordion overflow-hidden bg-white/10 border border-white/10 rounded-md">
+                            <div class="accordion-header py-5 px-6 flex justify-between items-center cursor-pointer"
+                                (click)="toggleAccordion(i)">
+                                <div class="flex flex-col">
+                                    <span class="text-base font-semibold">{{ item.title }}</span>
+                                    <span class="text-sm text-amber-400">$3456</span>
+                                </div>
+                            </div>
+                            <div class="accordion-content px-4 text-sm" [class.active]="openedIndex === i">
+                                {{ item.content }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+        
+                <div class="px-6 pt-5">
+                    <div class="text-lg font-semibold text-amber-400">
+                        Sedes de la Empresa
+                    </div>
+                    <div class="mx-auto mt-2 space-y-4 text-white ">
+                        <div *ngFor="let sede of sedes" class="rounded-md p-4 bg-white/10 border border-white/10 mb-3-5">
+                            <div class="flex items-start gap-3">
+                                <span class="text-xl">🏢</span>
+                                <div>
+                                    <div class="text-base font-semibold text-amber-400">
+                                        {{ sede.nombre }}
+                                    </div>
+                                    <div class="text-sm text-white/80">📍 {{ sede.ubicacion }}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+        
+                <div class="px-6 py-6 mt-10">
+                    <div class="text-lg font-semibold text-amber-400">Opciones</div>
+                    <div class="grid grid-cols-3 gap-5 mt-3">
+                        <a class="flex flex-col items-center bg-transparent text-white border-1 border-stone-300 rounded-lg p-2 py-2"
+                            (click)="goToSlide(1)">
+                            <img src="../../../../../../assets/template/icons/white/servicios.svg" alt="" width="35">
+                            <span class="mt-2 text-sm font-medium">Servicios</span>
+                        </a>
+        
+                        <a class="flex flex-col items-center bg-transparent text-white border-1 border-stone-300 rounded-lg p-2 py-2"
+                            (click)="goToSlide(2)">
+                            <img src="../../../../../../assets/template/icons/white/gallery.svg" alt="" width="35">
+                            <span class="mt-2 text-sm font-medium">Galeria</span>
+                        </a>
+        
+                        <a class="flex flex-col items-center bg-transparent text-white border-1 border-stone-300 rounded-lg p-2 py-2.5"
+                            (click)="goToSlide(4)">
+                            <img src="../../../../../../assets/template/icons/white/aliados.svg" alt="" width="45">
+                            <span class="mt-3 text-sm font-medium">Aliados</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDER SECUNDARIO 4 -->
+        <div class="snap-center shrink-0 w-full h-full overflow-y-auto sections">
+            <ng-container *ngTemplateOutlet="Banner"></ng-container>
+
+            <div class="px-6 mt-2 pb-32 py-6">
+            <div class="flex gap-3 mb-4 w-full flex justify-center border-1 border-transparent border-b-stone-400 py-2">
+                <img src="../../../../../../assets/template/icons/search.svg" alt="">
+                <h3 class="text-lg font-semibold text-amber-400 ">Aliados – Estratégicos</h3>
+            </div>
+
+            <div class="mt-10 space-y-6">
+                <div *ngFor="let aliado of aliados" class="pb-6 border-b border-white/10">
+                <div class="flex justify-between items-center">
+                    <div class="flex items-start gap-4">
+                    <div class="w-15 h-15 flex-shrink-0">
+                        <img [src]="aliado.imagen" class="w-full h-full object-cover rounded-md" alt="{{ aliado.nombre }}">
+                    </div>
+                    <div class="flex flex-col justify-center">
+                        <div class="text-lg font-semibold text-amber-400">{{ aliado.nombre }}</div>
+                        <div class="text-[10px] text-white/80">{{ aliado.cargo }}</div>
+                        <div class="text-[10px] text-white/80">
+                        <span class="font-semibold">{{ aliado.empresa }}</span> - {{ aliado.pais }}
+                        </div>
+                    </div>
+                    </div>
+                    <div class="flex items-center">
+                    <img src="../../../../../../assets/template/icons/arrow-left.svg" class="w-5 h-5 opacity-70 hover:opacity-100 transition" alt="arrow">
+                    </div>
+                </div>
+                </div>
+            </div>
+
+            <div class="py-6 mt-10">
+                <div class="text-lg font-semibold text-amber-400">Opciones</div>
+                <div class="grid grid-cols-3 gap-5 mt-3">
+                <a class="flex flex-col items-center bg-transparent text-white border-1 border-stone-300 rounded-lg p-2 py-2" (click)="goToSlide(1)">
+                    <img src="../../../../../../assets/template/icons/white/servicios.svg" alt="" width="35">
+                    <span class="mt-2 text-sm font-medium">Servicios</span>
+                </a>
+                <a class="flex flex-col items-center bg-transparent text-white border-1 border-stone-300 rounded-lg p-2 py-2" (click)="goToSlide(2)">
+                    <img src="../../../../../../assets/template/icons/white/gallery.svg" alt="" width="35">
+                    <span class="mt-2 text-sm font-medium">Galeria</span>
+                </a>
+                <a class="flex flex-col items-center bg-transparent text-white border-1 border-stone-300 rounded-lg p-2 py-2" (click)="goToSlide(3)">
+                    <img src="../../../../../../assets/template/icons/white/contacto.svg" alt="" width="35">
+                    <span class="mt-2 text-sm font-medium">Contacto</span>
+                </a>
+                
+                </div>
+            </div>
+
+            </div>
+        </div>
+
+    </div>
+
+
+    <!-- BOTONES FIJOS -->
+    <div class="block lg:hidden fixed bottom-0 left-0 w-full z-20">
+
+        <!-- BOTONES EXPANDIDOS (APARECEN DESPACIO) -->
+        <div class="flex flex-col justify-center items-center gap-2 w-full bg-white border-t border-gray-200 p-2 pb-9 px-4 rounded-t-[25px] shadow-x fixed bottom-[27px] left-0 z-30 transition-all duration-200 ease-out"
+            [ngClass]="{ 'opacity-100 translate-y-0 pointer-events-auto': showSaveOptions, 'opacity-0 translate-y-6 pointer-events-none': !showSaveOptions}">
+            <a class="flex justify-end items-end w-full" (click)="toggleSaveOptions()">
+                <img src="../../../../../../assets/template/icons/x.svg" width="35" />
+            </a>
+        
+            <div class="flex flex-col justify-center items-center gap-4 w-full px-6">
+                <button type="button" class="btn text-[1.2rem] font-bold w-full rounded-full bg-[#FFC328] p-3">
+                    Guardar Contacto
+                </button>
+        
+                <button type="button"
+                    class="btn text-[1.2rem] font-medium w-full rounded-full bg-white border-2 border-[#031b32] p-3">
+                   Tarjeta en el escritorio
+                </button>
+            </div>
+        
+        </div>
+
+        <!-- BOTONES NORMALES -->
+        <div class="flex justify-center items-center w-full gap-4 bg-white border-t border-gray-200 p-3 px-6
+            transition-all duration-200" [ngClass]="{
+        'opacity-0 pointer-events-none': showSaveOptions,
+        'opacity-100': !showSaveOptions
+        }">
+            <button type="button" class="btn text-[1.5rem] font-semibold w-full rounded-full bg-[#FFC328] p-2"
+                (click)="toggleSaveOptions()">
+                Guardar
+            </button>
+
+            <button type="button" class="btn text-[1.8rem] font-bold rounded-full bg-[#031b32] text-white p-3">
+                <img src="../../../../../../assets/template/icons/message.svg" alt="" class="mx-auto" width="40" />
+            </button>
+        </div>
+
+        <!-- FOOTER -->
+        <div class="flex justify-center items-center bg-[#140056] text-white py-1 text-[12px]">
+            <span>
+                © Copyright
+                <a href="https://diocards.com/es/" target="_blank">DioCards</a>
+            </span>
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- Panel deslizante con clase SCSS -->
+<div class="galery-panel" [class.open]="galeryOpen">
+  <div class="panel-content">
+    
+    <!-- Encabezado móvil -->
+    <div class="bg-back-one w-full lg:hidden">
+      <nav class="flex items-center justify-between p-3 px-4">
+        <div class="flex gap-x-4 items-center">
+          <img class="inline-block size-9 rounded-full ring-2 ring-white"
+            src="https://images.unsplash.com/photo-1491528323818-fdd1faba62cc?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" />
+          <div class="min-w-0 flex-auto">
+            <p class="text-sm/6 font-semibold text-white">Leslie Alexander</p>
+            <p class="truncate text-[10px] text-white">leslie.alexanderexample.com</p>
+          </div>
+        </div>
+        <div class="flex">
+          <button type="button" class="inline-flex pe-2.5" (click)="toggleGalery()">
+            <img src="../../../../../../assets/template/icons/x-white.svg" alt="" width="20" />
+          </button>
+        </div>
+      </nav>
+    </div>
+
+    <!-- Contenido galería -->
+    <div class="px-6 mt-2 pb-10">
+      <div class="mb-4 w-full flex justify-center border-b border-stone-400 py-2">
+        <h3 class="text-lg font-semibold text-amber-400">Galery</h3>
+      </div>
+
+      <div class="w-full grid grid-cols-2 gap-x-4 gap-y-4 pt-4">
+        <div *ngFor="let img of images" class="relative w-full h-[150px] bg-[#3333332b] rounded-[10px] overflow-hidden">
+          <img [src]="img" alt="" class="w-full h-full object-cover" />
+          <div class="absolute inset-0 bg-[#00000066] z-[1] pointer-events-none"></div>
+          <div
+            class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[2] text-white text-[32px] pointer-events-none">
+            <a href="#" class="mdi mdi-camera-flip-outline"></a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<ng-template #Card>
+  <div class="p-4 flex justify-center items-center">
+    <div class="containercard">
+      <div
+  class="outer-div"
+  [class.flipped]="isFlipped"
+  (mouseenter)="onMouseEnter()"
+  (mouseleave)="onMouseLeave()"
+  (click)="toggleFlip()"
+>
+        <div class="inner-div">
+          <div class="front">
+            <div class="floating-element">
+              <div class="groupfi">
+                <div class="imaavatar" style="background-image: url('../../../../../../assets/template/img/foto-perfil.jpg')"></div>
+                <div class="infotar">
+                  <div class="groupinfo">
+                    <div class="sname">Humberto</div>
+                    <div class="lastname">Rolon Visbal</div>
+                    <div class="scargo">CEO - Graphic Designer</div>
+                    <div class="ncompany">DIOSTUDIO LLC</div>
+                    <div class="imalogo">
+                      <img class="" src="../../../../../../assets/template/img/logotipo.png" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="back">
+            <div class="floating-element">
+              <div class="groupfi content-back">
+                <div class="image-top">
+                  <div class="overlay"></div>
+                  <img src="../../../../../../assets/template/img/logo-white.png" alt="" width="120">
+                </div>
+                <div class="image-bottom">
+                    <img src="../../../../../../assets/template/img/back-img.png" alt="" class="photo-user">
+                    <img src="../../../../../../assets/template/img/icon.png" alt="" class="photo-type">
+                    <div class="px-2 pt-1">
+                        <div class="name">
+                            Humberto Torregroza H
+                        </div>
+                        <div class="company-post">
+                            Executive Chairman and Co-Founder at DIOSTUDIO LLC
+                        </div>
+                        <div class="location">
+                            <img src="../../../../../../assets/template/img/country.png" alt="" class="photo-country">
+                            Fort Lauderdale, Florida, Estados Unidos
+                        </div>
+                    </div>
+                    </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #Banner>
+ <!-- Banner -->
+        <div class="bg-back-one w-full lg:hidden">
+            <nav class="flex items-center justify-between p-3 px-4">
+                <div class="flex gap-x-4 items-center">
+                    <img class="inline-block size-9 rounded-full ring-2 ring-white"  src="https://images.unsplash.com/photo-1491528323818-fdd1faba62cc?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" />
+                    <div class="min-w-0 flex-auto">
+                        <p class="text-sm/6 font-semibold text-white">Leslie Alexander</p>
+                        <p class="truncate text-[10px] text-white">leslie.alexanderexample.com</p>
+                    </div>
+                </div>
+                <div class="flex">
+                    <button type="button" class="inline-flex pe-2.5" (click)="togglePanel()">
+                        <img src="../../../../../../assets/template/icons/menu.svg" alt="" width="20" />
+                    </button>
+                </div>
+            </nav>
+        </div>
+
+        <!-- Barra de progreso -->
+        <div class="w-full h-[6px] bg-stone-900/40 relative overflow-hidden">
+            <div class="absolute top-0 h-full bg-[#b3b3b3] transition-all duration-500 ease-in-out rounded-full" [style.width.%]="indicatorWidth" [style.left.%]="indicatorLeft" [class.opacity-0]="currentIndex === 0" [class.opacity-100]="currentIndex > 0">
+            </div>
+        </div>
+</ng-template>
+
+<div class="flex">
+  <div *ngIf="showPanel" class="backdrop fixed inset-0 z-40 flex items-center justify-center" (click)="togglePanel()"> </div>
+
+  <div class="sidebar fixed inset-0 z-50" [ngClass]="{ 'visible': showPanel, 'hiding': !showPanel }" role="dialog" aria-modal="true">
+    <div class="min-h-screen w-full max-w-40 bg-menu shadow-xl ring-1 ring-gray-900/10 relative z-10">
+
+      <div class="w-full h-full">
+        <img src="../../../../../../assets/template/img/company-logo.png" alt="Logo">
+      </div>
+
+      <div class="flow-root py-3 px-2 text-white">
+        <div class="-my-6 divide-y divide-gray-500/10">
+          <div class="space-y-2 pb-6">
+            <a class="block px-3 py-2 text-xl font-semibold text-white mdi mdi-account-outline" (click)="goToSlide(0)">
+              <span class="pl-2 text-base">Perfil</span>
+            </a>
+
+            <a class="block px-3 py-2 text-xl font-semibold text-white mdi mdi-image-multiple" (click)="toggleGalery()">
+              <span class="pl-2 text-base">Galeria</span>
+            </a>
+
+            <a class="block px-3 py-2 text-xl font-semibold text-white mdi mdi-home-lightning-bolt" (click)="goToSlide(1)">
+              <span class="pl-2 text-base">Servicios</span>
+            </a>
+            <a class="block px-3 py-2 text-xl font-semibold text-white mdi mdi-briefcase-check" (click)="goToSlide(2)">
+              <span class="pl-2 text-base">Portafolio</span>
+            </a>
+            <a class="block px-3 py-2 text-xl font-semibold text-white mdi mdi-crosshairs-gps" (click)="goToSlide(3)">
+              <span class="pl-2 text-base">Contactos</span>
+            </a>
+            <a class="block px-3 py-2 text-xl font-semibold text-white mdi mdi-account-group" (click)="goToSlide(4)">
+              <span class="pl-2 text-base">Aliados</span>
+            </a>
+          </div>
+
+          <div class="container px-2 py-6">
+            <div class="w-full text-[11px] mb-2 font-normal"> Fuente</div>
+            <!-- Fila de botones -->
+            <div class="flex justify-between gap-2 pt-2">
+                <!-- Botón 1 -->
+                <div class="flex items-center justify-center h-12 w-18 rounded-md dark-overlay-bg text-center font-semibold">
+                    <a href="" class="block text-[22px] font-semibold text-white mdi mdi-format-font-size-increase"></a>
+                </div>
+            
+                <!-- Botón 2 -->
+                <div class="flex items-center justify-center h-12 w-18 rounded-md dark-overlay-bg text-center font-semibold">
+                    <a href="" class="block text-[22px] font-semibold text-white mdi mdi-backup-restore"></a>
+                </div>
+            </div>
+
+            <!-- Fila de idioma -->
+            <div class="pt-2">
+            <div class="flex gap-4 items-center h-12 w-30 px-5 rounded-md dark-overlay-bg text-center">
+                <a href="" class="block text-[18px] font-semibold text-white mdi mdi-translate"></a>
+                <span class="text-sm">English</span>
+            </div>
+            </div>
+
+
+          </div>
+         
+          <div class="py-6 flex items-center gap-4">
+            <a href="#" class="block rounded-lg px-3 py-2.5 text-base font-normal text-white mdi mdi-logout">
+              <span class="text-sm ms-3">Log In</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+

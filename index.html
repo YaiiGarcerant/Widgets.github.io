@@ -1,110 +1,160 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
+  <link rel="shortcut icon" href="rocket.png" type="image/x-icon">
+  <title>Portal de Ingeniería | Laboratorio</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;800&display=swap" rel="stylesheet">
 
-  <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-DXK7R6NMHL"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-
-    gtag('config', 'G-DXK7R6NMHL');
-  </script>
-
-
-  <!-- Google Tag Manager -->
-  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-  new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-  j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-  'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-  })(window,document,'script','dataLayer','GTM-KP95VX6X');</script>
-  <!-- End Google Tag Manager -->
-
-  
- 
-</head>
-
-<body>
-  <!-- Google Tag Manager (noscript) -->
-  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KP95VX6X"
-  height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-  <!-- End Google Tag Manager (noscript) -->
-  
   <style>
     body {
-      background-color: aliceblue;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh; 
+      font-family: 'Nunito', sans-serif;
     }
 
-    * {
-      font-family: "Nunito";
+    .glass-card {
+      background: rgba(22, 27, 34, 0.7);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
     }
 
-    .container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      width: 250px;
+    @keyframes float {
+
+      0%,
+      100% {
+        transform: translateY(0);
+      }
+
+      50% {
+        transform: translateY(-10px);
+      }
     }
 
-    button {
-      width: 250px;
-      height: 50px;
-      background-color: #FBC329;
-      border: none;
-      border-radius: 15px;
-      font-weight: bold;
-      margin: 10px 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
+    .animate-float {
+      animation: float 6s ease-in-out infinite;
     }
 
-    a {
-      text-decoration: none;
-      color: rgb(255, 255, 255);
-      font-size: 28px;
-      display: block;
-      width: 100%;
-      height: 100%;
-      padding: 10px; /* Ajusta esto según tu diseño */
-      box-sizing: border-box;
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(15px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
+    .fade-in-item {
+      animation: fadeIn 0.6s ease-out forwards;
+    }
   </style>
-  <div class="container">
-    <button type="button">
-      <a href="Clock/index.html">
-        Clock
-      </a>
-    </button>
+</head>
 
-    <button type="button">
-      <a href="cards/index.html">
-        var
-      </a>
-    </button>
+<body class="bg-[#0d1117] text-slate-200 min-h-screen flex items-center justify-center p-6 relative overflow-hidden">
 
-
-        <button type="button">
-      <a href="CARD/index.html">
-        var
-      </a>
-    </button>
-
-
-
-
+  <div
+    class="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-indigo-500/10 rounded-full blur-[120px] pointer-events-none">
+  </div>
+  <div
+    class="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-emerald-500/10 rounded-full blur-[120px] pointer-events-none">
   </div>
 
+  <div class="max-w-md w-full z-10">
+
+    <div class="text-center mb-12">
+      <div
+        class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/30 text-[10px] font-bold text-indigo-400 uppercase tracking-widest mb-4">
+        <span class="w-2 h-2 rounded-full bg-indigo-400 animate-ping"></span>
+        Nodo Central de Acceso
+      </div>
+      <h1 class="text-4xl font-extrabold text-white tracking-tight">Laboratorio <span class="text-indigo-400">IQ</span>
+      </h1>
+      <p class="text-slate-400 text-sm mt-3">Selecciona un módulo para inicializar el entorno de desarrollo.</p>
+    </div>
+
+    <div id="project-list" class="space-y-4">
+    </div>
+
+    <div class="mt-12 flex justify-center">
+      <div class="glass-card px-4 py-2 rounded-xl font-mono text-[10px] text-slate-500 flex items-center gap-3">
+        <div class="flex gap-1">
+          <div class="w-2 h-2 rounded-full bg-red-500/50"></div>
+          <div class="w-2 h-2 rounded-full bg-amber-500/50"></div>
+          <div class="w-2 h-2 rounded-full bg-emerald-500/50"></div>
+        </div>
+        <span>SISTEMA: <span class="text-emerald-400">OPERATIVO</span></span>
+        <span class="border-l border-slate-700 pl-3 uppercase">Latencia: 14ms</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Configuración de tus proyectos en español
+    const proyectos = [
+      {
+        nombre: 'Reloj de Sistema',
+        ruta: 'Clock/index.html',
+        icono: '🕒',
+        desc: 'Módulo de tiempo sincronizado',
+        color: 'indigo'
+      },
+
+      {
+        nombre: 'Gestor de Variables',
+        ruta: 'cards/index.html',
+        icono: '📊',
+        desc: 'Visualización de datos dinámicos',
+        color: 'emerald'
+      },
+      {
+        nombre: 'Módulo de Identidad',
+        ruta: 'CARD/index.html',
+        icono: '🪪',
+        desc: 'Validación de credenciales',
+        color: 'amber'
+      },
+
+      {
+        nombre: 'Proyectos De Calculo En Tiempo Real',
+        ruta: 'projects-math/index.html',
+        icono: '🧮',
+        desc: 'Módulo de Calculo sincronizado',
+        color: 'indigo'
+      },
+    ];
+
+    function renderizarProyectos() {
+      const contenedor = document.getElementById('project-list');
+
+      contenedor.innerHTML = proyectos.map((p, i) => `
+        <a href="${p.ruta}" 
+           class="fade-in-item group glass-card flex items-center p-4 rounded-2xl transition-all duration-300 hover:scale-[1.03] hover:bg-[#161b22] hover:border-${p.color}-500/50"
+           style="animation-delay: ${i * 0.15}s; opacity: 0;">
+          
+          <div class="w-12 h-12 rounded-xl bg-${p.color}-500/10 border border-${p.color}-500/20 flex items-center justify-center text-2xl group-hover:bg-${p.color}-500/20 transition-all">
+            ${p.icono}
+          </div>
+          
+          <div class="ml-4 flex-grow">
+            <h3 class="text-white font-bold text-base leading-none">${p.nombre}</h3>
+            <p class="text-[10px] text-slate-500 mt-1 uppercase tracking-wider font-mono">${p.desc}</p>
+          </div>
+          
+          <div class="text-slate-600 group-hover:text-indigo-400 transition-colors">
+            <svg class="w-5 h-5 translate-x-0 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+            </svg>
+          </div>
+        </a>
+      `).join('');
+    }
+
+    document.addEventListener('DOMContentLoaded', renderizarProyectos);
+  </script>
 
 </body>
 

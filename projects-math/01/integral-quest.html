@@ -1,0 +1,1101 @@
+<!DOCTYPE html>
+<html lang="es" class="bg-slate-900">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Integral Quest - Aprende Jugando</title>
+  <meta name="description" content="Aplicación gamificada de aprendizaje de Cálculo Integral" />
+  <link rel="shortcut icon" href="../../rocket.png" type="image/x-icon">
+
+  <!-- Tailwind CSS (CDN) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- KaTeX for LaTeX rendering -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" />
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+
+  <!-- Chart.js for precision doughnut chart -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+  <!-- Google Fonts: Geist -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet" />
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Geist', 'system-ui', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              400: '#818cf8',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+            },
+          },
+          borderRadius: {
+            '4xl': '2rem',
+          },
+          animation: {
+            'coin-bounce': 'coin-bounce 0.5s ease-in-out',
+            'pulse-glow': 'pulse-glow 2s ease-in-out infinite',
+            'float': 'float 3s ease-in-out infinite',
+            'shake': 'shake 0.5s ease-in-out',
+            'slide-in': 'slide-in 0.4s ease-out forwards',
+            'fade-in-scale': 'fade-in-scale 0.3s ease-out forwards',
+          },
+          keyframes: {
+            'coin-bounce': {
+              '0%,100%': { transform: 'translateY(0) rotate(0deg)' },
+              '50%': { transform: 'translateY(-4px) rotate(10deg)' },
+            },
+            'pulse-glow': {
+              '0%,100%': { 'box-shadow': '0 0 20px rgba(99,102,241,0.4)' },
+              '50%': { 'box-shadow': '0 0 40px rgba(99,102,241,0.8)' },
+            },
+            'float': {
+              '0%,100%': { transform: 'translateY(0)' },
+              '50%': { transform: 'translateY(-8px)' },
+            },
+            'shake': {
+              '0%,100%': { transform: 'translateX(0)' },
+              '10%,30%,50%,70%,90%': { transform: 'translateX(-5px)' },
+              '20%,40%,60%,80%': { transform: 'translateX(5px)' },
+            },
+            'slide-in': {
+              from: { opacity: 0, transform: 'translateY(20px)' },
+              to: { opacity: 1, transform: 'translateY(0)' },
+            },
+            'fade-in-scale': {
+              from: { opacity: 0, transform: 'scale(0.95)' },
+              to: { opacity: 1, transform: 'scale(1)' },
+            },
+          },
+        },
+      },
+    };
+  </script>
+
+  <style>
+    html,
+    body {
+      font-family: 'Geist', system-ui, sans-serif;
+    }
+
+    /* Glassmorphism utilities */
+    .glass {
+      background: rgba(30, 41, 59, 0.7);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .glass-card {
+      background: rgba(30, 41, 59, 0.5);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    /* Background aurora */
+    .aurora-bg {
+      background:
+        radial-gradient(circle at 20% 20%, rgba(99, 102, 241, 0.25), transparent 40%),
+        radial-gradient(circle at 80% 30%, rgba(251, 191, 36, 0.15), transparent 40%),
+        radial-gradient(circle at 50% 80%, rgba(34, 197, 94, 0.15), transparent 40%),
+        #0f172a;
+    }
+
+    /* KaTeX custom sizing */
+    .katex {
+      font-size: 1.25em;
+    }
+
+    .katex-display {
+      margin: 0 !important;
+    }
+
+    /* Hide scrollbar but allow scroll */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  </style>
+</head>
+
+<body class="aurora-bg min-h-screen text-slate-100 antialiased">
+  <!-- ROOT APP CONTAINER -->
+  <div id="app" class="min-h-screen w-full"></div>
+
+  <!-- ================== DATA: QUESTIONS ================== -->
+  <script>
+    const integralQuestions = [
+      // NIVEL 1
+      { id: 1, level: 1, question: "Calcula:", latex: "\\int x \\, dx", options: ["\\frac{x^2}{2} + C", "x + C", "\\frac{x^3}{3} + C", "2x + C"], correctIndex: 0, hint: "Regla: ∫xⁿ dx = xⁿ⁺¹/(n+1)" },
+      { id: 2, level: 1, question: "Calcula:", latex: "\\int x^2 \\, dx", options: ["\\frac{x^3}{3} + C", "x^3 + C", "2x + C", "x^2 + C"], correctIndex: 0, hint: "Suma 1 al exponente (2+1=3) y divide por 3." },
+      { id: 3, level: 1, question: "Calcula:", latex: "\\int 5 \\, dx", options: ["5x + C", "5 + C", "x^5 + C", "0 + C"], correctIndex: 0, hint: "La integral de una constante k es kx." },
+      { id: 4, level: 1, question: "Calcula:", latex: "\\int x^3 \\, dx", options: ["\\frac{x^4}{4} + C", "3x^2 + C", "x^4 + C", "4x^4 + C"], correctIndex: 0, hint: "n=3, por lo tanto el resultado es x⁴/4." },
+      { id: 5, level: 1, question: "Calcula:", latex: "\\int 2x \\, dx", options: ["x^2 + C", "2x^2 + C", "2 + C", "x^2/2 + C"], correctIndex: 0, hint: "El 2 se cancela con el denominador de x²/2." },
+      { id: 6, level: 1, question: "Calcula:", latex: "\\int x^4 \\, dx", options: ["\\frac{x^5}{5} + C", "4x^3 + C", "x^5 + C", "\\frac{x^4}{4} + C"], correctIndex: 0, hint: "Aplica xⁿ⁺¹/(n+1)." },
+      { id: 7, level: 1, question: "Calcula:", latex: "\\int 3x^2 \\, dx", options: ["x^3 + C", "3x^3 + C", "6x + C", "x^3/3 + C"], correctIndex: 0, hint: "3 * (x³/3) simplifica el 3." },
+      { id: 8, level: 1, question: "Calcula:", latex: "\\int x^9 \\, dx", options: ["\\frac{x^{10}}{10} + C", "9x^8 + C", "x^{10} + C", "10x^{10} + C"], correctIndex: 0, hint: "El nuevo exponente es 10." },
+      { id: 9, level: 1, question: "Calcula:", latex: "\\int 1 \\, dx", options: ["x + C", "1 + C", "0 + C", "C"], correctIndex: 0, hint: "Integral de dx es simplemente x." },
+      { id: 10, level: 1, question: "Calcula:", latex: "\\int x^{10} \\, dx", options: ["\\frac{x^{11}}{11} + C", "11x^{10} + C", "x^{11} + C", "\\frac{x^{10}}{10} + C"], correctIndex: 0, hint: "n=10, n+1=11." },
+
+      // NIVEL 2
+      { id: 11, level: 2, question: "Resuelve:", latex: "\\int (x + 1) \\, dx", options: ["\\frac{x^2}{2} + x + C", "x^2 + x + C", "2x + C", "x^2 + C"], correctIndex: 0, hint: "Integra x y el 1 por separado." },
+      { id: 12, level: 2, question: "Resuelve:", latex: "\\int (x^2 - 2) \\, dx", options: ["\\frac{x^3}{3} - 2x + C", "x^3 - 2x + C", "\\frac{x^3}{3} + C", "2x + C"], correctIndex: 0, hint: "Integra término a término." },
+      { id: 13, level: 2, question: "Resuelve:", latex: "\\int \\frac{1}{x^2} \\, dx", options: ["-\\frac{1}{x} + C", "\\frac{1}{x} + C", "\\ln(x^2) + C", "-2x^{-3} + C"], correctIndex: 0, hint: "Reescribe como x⁻² y suma 1 al exponente." },
+      { id: 14, level: 2, question: "Resuelve:", latex: "\\int \\sqrt{x} \\, dx", options: ["\\frac{2x^{3/2}}{3} + C", "\\frac{3x^{3/2}}{2} + C", "\\frac{1}{2\\sqrt{x}} + C", "x^{3/2} + C"], correctIndex: 0, hint: "x^{1/2} integrado es x^{3/2} dividido por 3/2." },
+      { id: 15, level: 2, question: "Resuelve:", latex: "\\int (3x^2 + 4x) \\, dx", options: ["x^3 + 2x^2 + C", "3x^3 + 4x^2 + C", "x^3 + 4x^2 + C", "6x + 4 + C"], correctIndex: 0, hint: "Integra cada parte usando la regla de potencia." },
+      { id: 16, level: 2, question: "Resuelve:", latex: "\\int \\frac{1}{x^3} \\, dx", options: ["-\\frac{1}{2x^2} + C", "\\frac{1}{2x^2} + C", "\\ln(x^3) + C", "-\\frac{3}{x^4} + C"], correctIndex: 0, hint: "Es x⁻³. Al integrar queda x⁻²/(-2)." },
+      { id: 17, level: 2, question: "Resuelve:", latex: "\\int (6x^5) \\, dx", options: ["x^6 + C", "6x^6 + C", "30x^4 + C", "x^5 + C"], correctIndex: 0, hint: "6 * (x⁶/6) = x⁶." },
+      { id: 18, level: 2, question: "Resuelve:", latex: "\\int (x^2 + x + 1) \\, dx", options: ["\\frac{x^3}{3} + \\frac{x^2}{2} + x + C", "x^3 + x^2 + x + C", "x^2 + C", "3x^2 + 2x + 1"], correctIndex: 0, hint: "Aplica la regla de potencia a cada término." },
+      { id: 19, level: 2, question: "Resuelve:", latex: "\\int 8x^7 \\, dx", options: ["x^8 + C", "8x^8 + C", "x^7 + C", "56x^6 + C"], correctIndex: 0, hint: "8/8 se simplifica." },
+      { id: 20, level: 2, question: "Resuelve:", latex: "\\int \\frac{1}{\\sqrt{x}} \\, dx", options: ["2\\sqrt{x} + C", "\\sqrt{x} + C", "\\frac{1}{2}\\sqrt{x} + C", "2x + C"], correctIndex: 0, hint: "x^{-1/2} integrado es x^{1/2}/(1/2)." },
+
+      // NIVEL 3
+      { id: 21, level: 3, question: "Integral de:", latex: "\\int \\cos(x) \\, dx", options: ["\\sin(x) + C", "-\\sin(x) + C", "\\cos(x) + C", "0"], correctIndex: 0, hint: "La derivada del seno es el coseno." },
+      { id: 22, level: 3, question: "Integral de:", latex: "\\int \\sin(x) \\, dx", options: ["-\\cos(x) + C", "\\cos(x) + C", "\\sin(x) + C", "1"], correctIndex: 0, hint: "Cuidado con el signo: integral del seno es -coseno." },
+      { id: 23, level: 3, question: "Integral de:", latex: "\\int \\sec^2(x) \\, dx", options: ["\\tan(x) + C", "-\\tan(x) + C", "\\sec(x) + C", "\\cos(x) + C"], correctIndex: 0, hint: "¿Qué función derivada da secante cuadrada?" },
+      { id: 24, level: 3, question: "Integral de:", latex: "\\int \\csc^2(x) \\, dx", options: ["-\\cot(x) + C", "\\cot(x) + C", "\\tan(x) + C", "-\\csc(x) + C"], correctIndex: 0, hint: "La integral de csc²(x) es -cot(x)." },
+      { id: 25, level: 3, question: "Integral de:", latex: "\\int \\sec(x)\\tan(x) \\, dx", options: ["\\sec(x) + C", "\\tan(x) + C", "\\cos(x) + C", "-\\sec(x) + C"], correctIndex: 0, hint: "Integral inmediata de la función secante." },
+      { id: 26, level: 3, question: "Integral de:", latex: "\\int (\\sin x + \\cos x) \\, dx", options: ["\\sin x - \\cos x + C", "\\cos x - \\sin x + C", "\\sin x + \\cos x + C", "0"], correctIndex: 0, hint: "Integra cada una: ∫sin = -cos, ∫cos = sin." },
+      { id: 27, level: 3, question: "Integral de:", latex: "\\int 4\\cos(x) \\, dx", options: ["4\\sin(x) + C", "-4\\sin(x) + C", "\\sin(4x) + C", "4x + C"], correctIndex: 0, hint: "La constante 4 sale de la integral." },
+      { id: 28, level: 3, question: "Integral de:", latex: "\\int -2\\sin(x) \\, dx", options: ["2\\cos(x) + C", "-2\\cos(x) + C", "2\\sin(x) + C", "\\cos(2x)"], correctIndex: 0, hint: "-2 * (-cos(x)) = 2cos(x)." },
+      { id: 29, level: 3, question: "Integral de:", latex: "\\int \\csc(x)\\cot(x) \\, dx", options: ["-\\csc(x) + C", "\\csc(x) + C", "-\\cot(x) + C", "\\tan(x) + C"], correctIndex: 0, hint: "Derivada de csc(x) es -csc(x)cot(x)." },
+      { id: 30, level: 3, question: "Integral de:", latex: "\\int (x + \\cos x) \\, dx", options: ["\\frac{x^2}{2} + \\sin x + C", "x^2 + \\sin x + C", "\\frac{x^2}{2} - \\sin x + C", "x\\sin x"], correctIndex: 0, hint: "Integra la potencia y luego la trigonométrica." },
+
+      // NIVEL 4
+      { id: 31, level: 4, question: "Resuelve:", latex: "\\int e^x \\, dx", options: ["e^x + C", "xe^x + C", "\\ln(e^x) + C", "e^x/x"], correctIndex: 0, hint: "La función exponencial eˣ es su propia integral." },
+      { id: 32, level: 4, question: "Resuelve:", latex: "\\int \\frac{1}{x} \\, dx", options: ["\\ln|x| + C", "e^x + C", "-x^{-2} + C", "x + C"], correctIndex: 0, hint: "Cuando n=-1, la regla de potencias no aplica; usa logaritmo." },
+      { id: 33, level: 4, question: "Resuelve:", latex: "\\int 2e^x \\, dx", options: ["2e^x + C", "e^{2x} + C", "2x e^x + C", "e^x + C"], correctIndex: 0, hint: "La constante no afecta a eˣ." },
+      { id: 34, level: 4, question: "Resuelve:", latex: "\\int \\frac{5}{x} \\, dx", options: ["5\\ln|x| + C", "\\ln|5x| + C", "5x + C", "-5/x^2"], correctIndex: 0, hint: "Extrae el 5: 5 * ∫(1/x)dx." },
+      { id: 35, level: 4, question: "Resuelve:", latex: "\\int e^{x+2} \\, dx", options: ["e^{x+2} + C", "e^x + 2 + C", "e^{x+3}/(x+3)", "2e^x"], correctIndex: 0, hint: "e^{x+2} es eˣ * e². La constante e² se mantiene." },
+      { id: 36, level: 4, question: "Resuelve:", latex: "\\int (e^x + x) \\, dx", options: ["e^x + \\frac{x^2}{2} + C", "e^x + x^2 + C", "xe^x + C", "e^{x+1}"], correctIndex: 0, hint: "Suma de dos integrales básicas." },
+      { id: 37, level: 4, question: "Resuelve:", latex: "\\int 3^x \\, dx", options: ["\\frac{3^x}{\\ln 3} + C", "3^x \\ln 3 + C", "3^{x+1} + C", "x 3^{x-1}"], correctIndex: 0, hint: "Fórmula: ∫aˣ dx = aˣ/ln(a)." },
+      { id: 38, level: 4, question: "Resuelve:", latex: "\\int 10^x \\, dx", options: ["\\frac{10^x}{\\ln 10} + C", "10^x + C", "10^x \\ln 10", "x^{10}"], correctIndex: 0, hint: "Base a = 10." },
+      { id: 39, level: 4, question: "Resuelve:", latex: "\\int \\frac{1}{x+1} \\, dx", options: ["\\ln|x+1| + C", "\\ln|x| + 1 + C", "1 + C", "\\frac{1}{x^2}"], correctIndex: 0, hint: "Sustitución simple u=x+1, du=dx." },
+      { id: 40, level: 4, question: "Resuelve:", latex: "\\int (2^x + e^x) \\, dx", options: ["\\frac{2^x}{\\ln 2} + e^x + C", "2^x + e^x + C", "2^x \\ln 2 + e^x", "e^x"], correctIndex: 0, hint: "Integra cada base exponencial por separado." },
+
+      // NIVEL 5
+      { id: 41, level: 5, question: "Usa u = 2x:", latex: "\\int \\cos(2x) \\, dx", options: ["\\frac{\\sin(2x)}{2} + C", "2\\sin(2x) + C", "-\\sin(2x) + C", "\\sin(x)"], correctIndex: 0, hint: "Al derivar u=2x, aparece un 1/2 afuera." },
+      { id: 42, level: 5, question: "Usa u = 3x:", latex: "\\int e^{3x} \\, dx", options: ["\\frac{e^{3x}}{3} + C", "3e^{3x} + C", "e^{3x} + C", "e^x"], correctIndex: 0, hint: "La integral de e^{ax} es (1/a)e^{ax}." },
+      { id: 43, level: 5, question: "Usa u = 4x:", latex: "\\int \\sin(4x) \\, dx", options: ["-\\frac{\\cos(4x)}{4} + C", "\\frac{\\cos(4x)}{4} + C", "4\\cos(4x) + C", "-\\cos(x)"], correctIndex: 0, hint: "Integral del seno es -coseno, ajusta el coeficiente 4." },
+      { id: 44, level: 5, question: "Resuelve:", latex: "\\int (2x+1)^3 \\, dx", options: ["\\frac{(2x+1)^4}{8} + C", "\\frac{(2x+1)^4}{4} + C", "(2x+1)^4 + C", "2(2x+1)^2"], correctIndex: 0, hint: "Sustitución u=2x+1, du=2dx. Divide por 2 al final." },
+      { id: 45, level: 5, question: "Resuelve:", latex: "\\int e^{-x} \\, dx", options: ["-e^{-x} + C", "e^{-x} + C", "e^x + C", "-x e^{-x}"], correctIndex: 0, hint: "Aquí a = -1, por lo tanto divides por -1." },
+      { id: 46, level: 5, question: "Resuelve:", latex: "\\int \\cos(x/2) \\, dx", options: ["2\\sin(x/2) + C", "\\frac{1}{2}\\sin(x/2) + C", "-\\sin(x/2) + C", "2\\cos(x/2)"], correctIndex: 0, hint: "Dividir por 1/2 es igual a multiplicar por 2." },
+      { id: 47, level: 5, question: "Resuelve:", latex: "\\int \\sec^2(5x) \\, dx", options: ["\\frac{\\tan(5x)}{5} + C", "5\\tan(5x) + C", "\\tan(5x) + C", "\\sec(5x)"], correctIndex: 0, hint: "Ajusta por el coeficiente de x." },
+      { id: 48, level: 5, question: "Resuelve:", latex: "\\int \\frac{1}{3x+2} \\, dx", options: ["\\frac{\\ln|3x+2|}{3} + C", "3\\ln|3x+2| + C", "\\ln|3x+2| + C", "3x"], correctIndex: 0, hint: "Logaritmo con ajuste de cadena 1/3." },
+      { id: 49, level: 5, question: "Resuelve:", latex: "\\int e^{5x} \\, dx", options: ["\\frac{e^{5x}}{5} + C", "5e^{5x} + C", "e^{5x} + C", "e^x"], correctIndex: 0, hint: "Fórmula de e^{ax}." },
+      { id: 50, level: 5, question: "Resuelve:", latex: "\\int \\sin(\\pi x) \\, dx", options: ["-\\frac{\\cos(\\pi x)}{\\pi} + C", "\\pi\\cos(\\pi x) + C", "-\\cos(\\pi x) + C", "0"], correctIndex: 0, hint: "La constante es π." },
+
+      // NIVEL 6
+      { id: 51, level: 6, question: "Integral de:", latex: "\\int \\tan(x) \\, dx", options: ["-\\ln|\\cos x| + C", "\\ln|\\sin x| + C", "\\sec^2 x + C", "\\ln|\\tan x|"], correctIndex: 0, hint: "tan x = sin x / cos x. Usa u = cos x." },
+      { id: 52, level: 6, question: "Integral de:", latex: "\\int \\cot(x) \\, dx", options: ["\\ln|\\sin x| + C", "-\\ln|\\sin x| + C", "-\\csc^2 x + C", "\\ln|\\cos x|"], correctIndex: 0, hint: "cot x = cos x / sin x. Usa u = sin x." },
+      { id: 53, level: 6, question: "Integral de:", latex: "\\int \\frac{1}{x^2+1} \\, dx", options: ["\\arctan(x) + C", "\\ln(x^2+1) + C", "\\arcsin(x) + C", "\\frac{1}{x}"], correctIndex: 0, hint: "Integral inmediata que da la arcotangente." },
+      { id: 54, level: 6, question: "Integral de:", latex: "\\int \\frac{1}{\\sqrt{1-x^2}} \\, dx", options: ["\\arcsin(x) + C", "\\arccos(x) + C", "\\arctan(x) + C", "\\ln(x)"], correctIndex: 0, hint: "Integral inmediata que da el arcoseno." },
+      { id: 55, level: 6, question: "Integral de:", latex: "\\int \\sec(x) \\, dx", options: ["\\ln|\\sec x + \\tan x| + C", "\\sec^2 x + C", "\\tan x + C", "\\ln|\\cos x|"], correctIndex: 0, hint: "Fórmula especial de la secante." },
+      { id: 56, level: 6, question: "Integral de:", latex: "\\int 2\\sec^2(2x) \\, dx", options: ["\\tan(2x) + C", "2\\tan(2x) + C", "\\tan(x) + C", "\\sec(2x)"], correctIndex: 0, hint: "El 2 de la integral se cancela con el 1/2 de la sustitución." },
+      { id: 57, level: 6, question: "Integral de:", latex: "\\int \\frac{1}{x^2+9} \\, dx", options: ["\\frac{1}{3}\\arctan(\\frac{x}{3}) + C", "\\arctan(\\frac{x}{3}) + C", "\\frac{1}{9}\\arctan(x) + C", "\\ln(x^2+9)"], correctIndex: 0, hint: "Usa la fórmula ∫dx/(x²+a²) = (1/a)arctan(x/a)." },
+      { id: 58, level: 6, question: "Integral de:", latex: "\\int \\frac{1}{\\sqrt{4-x^2}} \\, dx", options: ["\\arcsin(\\frac{x}{2}) + C", "\\frac{1}{2}\\arcsin(\\frac{x}{2}) + C", "\\arcsin(x) + C", "2\\arcsin(x)"], correctIndex: 0, hint: "Fórmula: ∫dx/√(a²-x²) = arcsin(x/a)." },
+      { id: 59, level: 6, question: "Integral de:", latex: "\\int \\csc(x) \\, dx", options: ["-\\ln|\\csc x + \\cot x| + C", "\\ln|\\csc x - \\cot x| + C", "\\cot x + C", "\\ln|\\sin x|"], correctIndex: 0, hint: "Fórmula especial de la cosecante." },
+      { id: 60, level: 6, question: "Integral de:", latex: "\\int \\frac{x}{x^2+1} \\, dx", options: ["\\frac{1}{2}\\ln(x^2+1) + C", "\\ln(x^2+1) + C", "\\arctan(x) + C", "x^2"], correctIndex: 0, hint: "Sustitución u = x²+1, du = 2x dx." },
+
+      // NIVEL 7
+      { id: 61, level: 7, question: "Evalúa:", latex: "\\int_{0}^{1} x \\, dx", options: ["1/2", "1", "0", "2"], correctIndex: 0, hint: "[x²/2] de 0 a 1." },
+      { id: 62, level: 7, question: "Evalúa:", latex: "\\int_{1}^{2} x^2 \\, dx", options: ["7/3", "3", "8/3", "1"], correctIndex: 0, hint: "(2³/3) - (1³/3) = 8/3 - 1/3." },
+      { id: 63, level: 7, question: "Evalúa:", latex: "\\int_{0}^{2} 3 \\, dx", options: ["6", "3", "0", "2"], correctIndex: 0, hint: "3x evaluado de 0 a 2." },
+      { id: 64, level: 7, question: "Evalúa:", latex: "\\int_{0}^{\\pi} \\sin x \\, dx", options: ["2", "0", "1", "-1"], correctIndex: 0, hint: "[-cos(x)] de 0 a π. -cos(π) - (-cos(0)) = 1 + 1." },
+      { id: 65, level: 7, question: "Evalúa:", latex: "\\int_{1}^{e} \\frac{1}{x} \\, dx", options: ["1", "e", "0", "\\ln 2"], correctIndex: 0, hint: "ln(e) - ln(1) = 1 - 0." },
+      { id: 66, level: 7, question: "Evalúa:", latex: "\\int_{0}^{1} e^x \\, dx", options: ["e - 1", "e", "1", "0"], correctIndex: 0, hint: "e¹ - e⁰." },
+      { id: 67, level: 7, question: "Evalúa:", latex: "\\int_{0}^{2} x^3 \\, dx", options: ["4", "8", "16", "2"], correctIndex: 0, hint: "x⁴/4 evaluado de 0 a 2: 16/4 = 4." },
+      { id: 68, level: 7, question: "Evalúa:", latex: "\\int_{-1}^{1} x^2 \\, dx", options: ["2/3", "0", "1/3", "1"], correctIndex: 0, hint: "(1/3) - (-1/3) = 2/3." },
+      { id: 69, level: 7, question: "Evalúa:", latex: "\\int_{0}^{\\pi/2} \\cos x \\, dx", options: ["1", "0", "\\pi", "-1"], correctIndex: 0, hint: "sin(π/2) - sin(0)." },
+      { id: 70, level: 7, question: "Evalúa:", latex: "\\int_{1}^{3} (2x+1) \\, dx", options: ["10", "8", "12", "6"], correctIndex: 0, hint: "[x²+x] de 1 a 3: (9+3) - (1+1) = 12 - 2." },
+
+      // NIVEL 8
+      { id: 71, level: 8, question: "Evalúa:", latex: "\\int_{0}^{1} (4x^3 - 1) \\, dx", options: ["0", "1", "4", "-1"], correctIndex: 0, hint: "x⁴ - x evaluado de 0 a 1: 1 - 1 = 0." },
+      { id: 72, level: 8, question: "Evalúa:", latex: "\\int_{1}^{2} \\frac{1}{x^2} \\, dx", options: ["1/2", "1", "3/4", "-1/2"], correctIndex: 0, hint: "[-1/x] de 1 a 2: -1/2 - (-1) = 1/2." },
+      { id: 73, level: 8, question: "Evalúa:", latex: "\\int_{0}^{4} \\sqrt{x} \\, dx", options: ["16/3", "8", "4", "2"], correctIndex: 0, hint: "2/3 * x^{3/2} de 0 a 4: 2/3 * 8 = 16/3." },
+      { id: 74, level: 8, question: "Evalúa:", latex: "\\int_{0}^{\\pi/4} \\sec^2 x \\, dx", options: ["1", "0", "\\sqrt{2}", "1/2"], correctIndex: 0, hint: "tan(π/4) - tan(0)." },
+      { id: 75, level: 8, question: "Evalúa:", latex: "\\int_{0}^{1} \\frac{1}{x^2+1} \\, dx", options: ["\\pi/4", "1", "\\pi/2", "0"], correctIndex: 0, hint: "arctan(1) - arctan(0)." },
+      { id: 76, level: 8, question: "Evalúa:", latex: "\\int_{1}^{e^2} \\frac{1}{x} \\, dx", options: ["2", "e", "1", "0"], correctIndex: 0, hint: "ln(e²) - ln(1) = 2." },
+      { id: 77, level: 8, question: "Evalúa:", latex: "\\int_{0}^{1} x(x^2+1) \\, dx", options: ["3/4", "1/2", "1", "1/4"], correctIndex: 0, hint: "Integra x³ + x: x⁴/4 + x²/2." },
+      { id: 78, level: 8, question: "Evalúa:", latex: "\\int_{-1}^{1} x^3 \\, dx", options: ["0", "1/2", "2", "-1"], correctIndex: 0, hint: "Integral de función impar en intervalo simétrico es 0." },
+      { id: 79, level: 8, question: "Evalúa:", latex: "\\int_{0}^{2} e^{x/2} \\, dx", options: ["2(e-1)", "e-1", "2e", "e"], correctIndex: 0, hint: "2e^{x/2} de 0 a 2: 2e¹ - 2e⁰." },
+      { id: 80, level: 8, question: "Evalúa:", latex: "\\int_{1}^{2} 6x^2 \\, dx", options: ["14", "7", "21", "12"], correctIndex: 0, hint: "2x³ de 1 a 2: 2(8) - 2(1) = 14." },
+
+      // NIVEL 9
+      { id: 81, level: 9, question: "Resuelve:", latex: "\\int 2x e^{x^2} \\, dx", options: ["e^{x^2} + C", "x^2e^{x^2} + C", "2e^{x^2} + C", "e^x + C"], correctIndex: 0, hint: "u = x², du = 2x dx." },
+      { id: 82, level: 9, question: "Resuelve:", latex: "\\int \\frac{\\ln x}{x} \\, dx", options: ["\\frac{(\\ln x)^2}{2} + C", "\\ln(\\ln x) + C", "\\frac{1}{x^2} + C", "\\ln x + C"], correctIndex: 0, hint: "u = ln x, du = (1/x)dx." },
+      { id: 83, level: 9, question: "Resuelve:", latex: "\\int x(x^2+1)^5 \\, dx", options: ["\\frac{(x^2+1)^6}{12} + C", "\\frac{(x^2+1)^6}{6} + C", "(x^2+1)^6 + C", "x^2+1"], correctIndex: 0, hint: "u = x²+1, du = 2x dx. Divide por 2." },
+      { id: 84, level: 9, question: "Resuelve:", latex: "\\int \\sin^2 x \\cos x \\, dx", options: ["\\frac{\\sin^3 x}{3} + C", "\\frac{\\cos^3 x}{3} + C", "\\sin^3 x + C", "-\\frac{\\cos^3 x}{3}"], correctIndex: 0, hint: "u = sin x, du = cos x dx." },
+      { id: 85, level: 9, question: "Resuelve:", latex: "\\int \\frac{x}{x^2+9} \\, dx", options: ["\\frac{1}{2}\\ln(x^2+9) + C", "\\ln(x^2+9) + C", "\\arctan(x/3) + C", "x^2"], correctIndex: 0, hint: "u = x²+9, du = 2x dx." },
+      { id: 86, level: 9, question: "Resuelve:", latex: "\\int e^{\\cos x} \\sin x \\, dx", options: ["-e^{\\cos x} + C", "e^{\\cos x} + C", "e^{\\sin x} + C", "-\\cos x"], correctIndex: 0, hint: "u = cos x, du = -sin x dx." },
+      { id: 87, level: 9, question: "Resuelve:", latex: "\\int \\frac{e^x}{1+e^x} \\, dx", options: ["\\ln(1+e^x) + C", "e^x + C", "\\ln(e^x) + C", "1+e^x"], correctIndex: 0, hint: "u = 1+eˣ, du = eˣ dx." },
+      { id: 88, level: 9, question: "Resuelve:", latex: "\\int x\\cos(x^2) \\, dx", options: ["\\frac{\\sin(x^2)}{2} + C", "\\sin(x^2) + C", "2\\sin(x^2) + C", "x^2\\sin x"], correctIndex: 0, hint: "u = x², du = 2x dx." },
+      { id: 89, level: 9, question: "Resuelve:", latex: "\\int \\frac{\\sec^2 x}{\\tan x} \\, dx", options: ["\\ln|\\tan x| + C", "\\tan^2 x + C", "\\sec x + C", "\\ln|\\sec x|"], correctIndex: 0, hint: "u = tan x, du = sec² x dx." },
+      { id: 90, level: 9, question: "Resuelve:", latex: "\\int \\frac{2x+3}{x^2+3x} \\, dx", options: ["\\ln|x^2+3x| + C", "\\ln|2x+3| + C", "x^2+3x + C", "1/x"], correctIndex: 0, hint: "El numerador es la derivada exacta del denominador." },
+
+      // NIVEL 10
+      { id: 91, level: 10, question: "Integral de:", latex: "\\int \\frac{1}{x\\ln x} \\, dx", options: ["\\ln|\\ln x| + C", "(\\ln x)^2 + C", "\\frac{1}{\\ln x} + C", "\\ln x"], correctIndex: 0, hint: "u = ln x, du = 1/x dx." },
+      { id: 92, level: 10, question: "Integral de:", latex: "\\int (x^2+1)^2 \\, dx", options: ["\\frac{x^5}{5} + \\frac{2x^3}{3} + x + C", "x^5 + x^3 + x + C", "(x^2+1)^3/3", "x^4+1"], correctIndex: 0, hint: "Desarrolla el binomio: x⁴ + 2x² + 1." },
+      { id: 93, level: 10, question: "Integral de:", latex: "\\int \\frac{1}{\\sqrt{1-4x^2}} \\, dx", options: ["\\frac{1}{2}\\arcsin(2x) + C", "\\arcsin(2x) + C", "2\\arcsin(x) + C", "\\arctan(2x)"], correctIndex: 0, hint: "u = 2x, du = 2dx." },
+      { id: 94, level: 10, question: "Integral de:", latex: "\\int \\frac{e^x}{\\sqrt{1-e^{2x}}} \\, dx", options: ["\\arcsin(e^x) + C", "e^x + C", "\\ln(e^x) + C", "\\arctan(e^x)"], correctIndex: 0, hint: "u = eˣ, u² = e²ˣ." },
+      { id: 95, level: 10, question: "Integral de:", latex: "\\int \\frac{\\sin(\\ln x)}{x} \\, dx", options: ["-\\cos(\\ln x) + C", "\\cos(\\ln x) + C", "\\sin(\\ln x) + C", "x\\cos x"], correctIndex: 0, hint: "u = ln x, du = 1/x dx." },
+      { id: 96, level: 10, question: "Evalúa:", latex: "\\int_{0}^{1} x e^{x^2} \\, dx", options: ["\\frac{e-1}{2}", "e-1", "\\frac{e}{2}", "1"], correctIndex: 0, hint: "Sustitución u=x². Límites de 0 a 1." },
+      { id: 97, level: 10, question: "Integral de:", latex: "\\int \\frac{dx}{x^2+4}", options: ["\\frac{1}{2}\\arctan(\\frac{x}{2}) + C", "\\arctan(\\frac{x}{2}) + C", "\\frac{1}{4}\\arctan x + C", "\\ln(x^2+4)"], correctIndex: 0, hint: "a = 2 en la fórmula de arctan." },
+      { id: 98, level: 10, question: "Integral de:", latex: "\\int 5^x \\, dx", options: ["\\frac{5^x}{\\ln 5} + C", "5^x \\ln 5 + C", "x 5^{x-1}", "5^{x+1}"], correctIndex: 0, hint: "∫aˣ = aˣ/ln(a)." },
+      { id: 99, level: 10, question: "Integral de:", latex: "\\int \\frac{\\cos x}{\\sin^2 x} \\, dx", options: ["-\\frac{1}{\\sin x} + C", "\\frac{1}{\\sin x} + C", "\\ln|\\sin x| + C", "-\\cot x"], correctIndex: 0, hint: "u = sin x, integral de u⁻²." },
+      { id: 100, level: 10, question: "Final Quest:", latex: "\\int (e^x + \\sin x + x^2) \\, dx", options: ["e^x - \\cos x + \\frac{x^3}{3} + C", "e^x + \\cos x + x^3 + C", "xe^x - \\cos x + x^3", "e^x - \\sin x + x^2"], correctIndex: 0, hint: "¡Combinación de todas las reglas básicas!" },
+    ];
+  </script>
+
+  <!-- ================== GAME LOGIC ================== -->
+  <script>
+    // ===== Utility helpers =====
+    function shuffle(arr) {
+      const a = [...arr];
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
+    function renderLatex(el, tex, displayMode = true) {
+      if (!el) return;
+      try {
+        if (window.katex) {
+          window.katex.render(tex, el, {
+            displayMode,
+            throwOnError: false,
+            output: 'html',
+          });
+        } else {
+          el.textContent = tex;
+        }
+      } catch (e) {
+        el.textContent = tex;
+      }
+    }
+
+    function formatTime(seconds) {
+      const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+      const s = (seconds % 60).toString().padStart(2, '0');
+      return `${m}:${s}`;
+    }
+
+    // ===== Game State =====
+    const state = {
+      screen: 'subjects', // 'subjects' | 'instructions' | 'game' | 'results'
+      questions: [],
+      currentIndex: 0,
+      coins: 0,
+      correct: 0,
+      incorrect: 0,
+      time: 0,
+      timerId: null,
+      selected: null,
+      isCorrect: null,
+      showingFeedback: false,
+    };
+
+    let chartInstance = null;
+
+    // Build 20 questions: 2 random per level (1..10), with shuffled options
+    function buildSession() {
+      let result = [];
+      for (let level = 1; level <= 10; level++) {
+        const pool = integralQuestions.filter(q => q.level === level);
+        const picked = shuffle(pool).slice(0, 2);
+        for (const q of picked) {
+          // Shuffle options but keep track of correct index
+          const correctValue = q.options[q.correctIndex];
+          const shuffledOptions = shuffle(q.options);
+          const newCorrectIndex = shuffledOptions.indexOf(correctValue);
+          result.push({
+            ...q,
+            options: shuffledOptions,
+            correctIndex: newCorrectIndex,
+          });
+        }
+      }
+      return result;
+    }
+
+    function startTimer() {
+      stopTimer();
+      state.timerId = setInterval(() => {
+        state.time += 1;
+        const el = document.getElementById('timer-display');
+        if (el) el.textContent = formatTime(state.time);
+      }, 1000);
+    }
+
+    function stopTimer() {
+      if (state.timerId) {
+        clearInterval(state.timerId);
+        state.timerId = null;
+      }
+    }
+
+    function setScreen(screen) {
+      state.screen = screen;
+      render();
+    }
+
+    function startGame() {
+      state.questions = buildSession();
+      state.currentIndex = 0;
+      state.coins = 0;
+      state.correct = 0;
+      state.incorrect = 0;
+      state.time = 0;
+      state.selected = null;
+      state.isCorrect = null;
+      state.showingFeedback = false;
+      setScreen('game');
+      startTimer();
+    }
+
+    function resetGame() {
+      stopTimer();
+      if (chartInstance) {
+        chartInstance.destroy();
+        chartInstance = null;
+      }
+      state.questions = [];
+      state.currentIndex = 0;
+      state.coins = 0;
+      state.correct = 0;
+      state.incorrect = 0;
+      state.time = 0;
+      state.selected = null;
+      state.isCorrect = null;
+      state.showingFeedback = false;
+      setScreen('subjects');
+    }
+
+    function answerQuestion(idx) {
+      if (state.showingFeedback) return;
+
+      const q = state.questions[state.currentIndex];
+      const isCorrect = idx === q.correctIndex;
+
+      state.selected = idx;
+      state.isCorrect = isCorrect;
+      state.showingFeedback = true;
+
+      if (isCorrect) {
+        state.coins += 100;
+        state.correct += 1;
+      } else {
+        state.coins = Math.max(0, state.coins - 50);
+        state.incorrect += 1;
+      }
+
+      render(); // Muestra el feedback (rojo/verde)
+
+      // Bajamos el delay de error de 3000 a 2000 o 1500
+      const delay = isCorrect ? 1000 : 2000;
+
+      setTimeout(() => {
+        // Si quieres eliminar el lag visual, podrías añadir una clase de "fade-out" aquí
+        nextQuestion();
+      }, delay);
+    }
+
+    function nextQuestion() {
+      const next = state.currentIndex + 1;
+
+      // Limpiamos los estados de feedback PRIMERO
+      state.selected = null;
+      state.isCorrect = null;
+      state.showingFeedback = false;
+
+      if (next >= state.questions.length) {
+        stopTimer();
+        setScreen('results');
+        return;
+      }
+
+      state.currentIndex = next;
+
+      // Si usas JS puro para renderizar, podrías limpiar el HTML aquí
+      // document.getElementById('quiz-container').innerHTML = ''; 
+
+      render();
+    }
+
+    // ===== RENDER =====
+    function render() {
+      const app = document.getElementById('app');
+
+      // Si ya estamos en el juego, no vacíes TODO el app, 
+      // solo actualiza los componentes internos.
+      if (state.screen === 'game' && document.querySelector('.game-container')) {
+        updateGameUI(); // Una función que solo cambie textos y anchos
+        return;
+      }
+
+      app.innerHTML = '';
+
+      if (state.screen === 'subjects') {
+        app.appendChild(renderSubjects());
+      } else if (state.screen === 'instructions') {
+        app.appendChild(renderInstructions());
+      } else if (state.screen === 'game') {
+        app.appendChild(renderGame());
+      } else if (state.screen === 'results') {
+        app.appendChild(renderResults());
+      }
+
+      // Post-render: render LaTeX and set up charts
+      if (state.screen === 'game') {
+        // Render question LaTeX
+        const qEl = document.querySelector('[data-latex="question"]');
+        if (qEl) renderLatex(qEl, qEl.dataset.tex, true);
+
+        // Render option LaTeX
+        document.querySelectorAll('[data-latex="option"]').forEach(el => {
+          renderLatex(el, el.dataset.tex, false);
+        });
+
+        // 2. Truco para la barra de progreso:
+        const progressBar = document.querySelector('.bg-gradient-to-r');
+        if (progressBar) {
+          const targetWidth = progressBar.style.width; // Guarda el valor final
+          progressBar.style.width = '0%'; // Empieza en 0 (o el valor anterior si lo guardas)
+
+          requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+              progressBar.style.width = targetWidth;
+            });
+          });
+        }
+
+        // Initialize chart
+        setupChart();
+      }
+    }
+
+    // ===== SCREEN: Subjects =====
+    function renderSubjects() {
+      const container = document.createElement('div');
+      container.className = 'min-h-screen flex flex-col items-center justify-center px-4 py-20';
+      container.innerHTML = `
+    <div class="max-w-6xl w-full animate-slide-in pt-10">
+      <div class="text-center mb-10">
+        <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass-card text-xs font-medium text-indigo-300 mb-4">
+          <span class="w-2 h-2 rounded-full bg-indigo-400 animate-pulse"></span>
+          Aprende matemáticas jugando
+        </div>
+       <div class="max-w-6xl w-full text-center relative animate-fade-in">
+      
+      <div class="absolute inset-0 pointer-events-none">
+        <div class="absolute top-0 left-10 md:left-20 animate-float opacity-40">
+           <div class="w-16 h-16 rounded-2xl border border-indigo-500/50 bg-indigo-500/10 flex items-center justify-center shadow-[0_0_30px_rgba(99,102,241,0.2)]">
+             <span class="text-2xl">🧠</span>
+           </div>
+        </div>
+        <div class="absolute top-10 right-10 md:right-20 animate-float-delayed opacity-40">
+           <div class="w-14 h-14 rounded-full border border-emerald-500/50 bg-emerald-500/10 flex items-center justify-center shadow-[0_0_30px_rgba(16,185,129,0.2)]">
+             <span class="text-xl">⚡</span>
+           </div>
+        </div>
+      </div>
+
+      <div class="relative z-10 py-6">
+        <h1 class="text-5xl md:text-7xl font-extrabold tracking-tighter mb-6">
+        El futuro del <br/>
+          <span class="bg-gradient-to-r from-indigo-400 via-cyan-400 to-emerald-400 bg-clip-text text-transparent">
+            aprendizaje humano
+          </span>
+        </h1>
+        <p class="text-slate-400 text-sm max-w-2xl mx-auto mb-10 text-pretty py-5">
+          Entrena tu cerebro como un modelo de Machine Learning. Optimización sináptica, 
+          gamificación avanzada y laboratorios de ingeniería en tiempo real.
+        </p>
+
+        
+      </div>
+
+      
+    </div>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-12">
+        ${subjectCardHTML({ title: 'Cálculo Integral', emoji: '∫', desc: '10 niveles · 100 preguntas', active: true, id: 'calc' })}
+        ${subjectCardHTML({ title: 'Álgebra Lineal', emoji: 'A', desc: 'Próximamente', active: false, id: 'algebra' })}
+        ${subjectCardHTML({ title: 'Física Mecánica', emoji: 'F', desc: 'Próximamente', active: false, id: 'fisica' })}
+        ${subjectCardHTML({ title: 'Programación Python', emoji: 'py', desc: 'Próximamente', active: false, id: 'python' })}
+      </div>
+
+      <div id="subject-info-panel" class="animate-fade-in">
+        ${infoPanelHTML('calc')} </div>
+    </div>
+  `;
+
+      // Lógica para cambiar la información al hacer clic (opcional, si quieres que cambie al tocar otras)
+      const cards = container.querySelectorAll('[data-id]');
+      cards.forEach(card => {
+        card.addEventListener('mouseenter', () => {
+          const id = card.getAttribute('data-id');
+          container.querySelector('#subject-info-panel').innerHTML = infoPanelHTML(id);
+        });
+
+        if (card.getAttribute('data-id') === 'calc') {
+          card.addEventListener('click', () => setScreen('instructions'));
+        }
+      });
+
+      return container;
+    }
+
+    function infoPanelHTML(id) {
+      // Datos estadísticos basados en estudios de neuroeducación y gamificación
+      const stats = {
+        retencion: { tradicional: '20%', gamificado: '90%' },
+        dopamina: '+150%',
+        error_rate: '-40%'
+      };
+
+      return `
+    <div class="glass-card rounded-[2rem] p-10 border-indigo-500/20 bg-indigo-500/5 relative overflow-hidden">
+      
+      <div class="flex flex-col lg:flex-row items-center gap-12 mb-12">
+        <div class="w-full lg:w-1/2 relative">
+          <div class="flex justify-between items-center px-8 relative">
+            <div class="relative group">
+              <div class="absolute -inset-4 bg-indigo-500/20 rounded-full blur-xl group-hover:bg-indigo-500/40 transition-all"></div>
+              <div class="w-20 h-20 rounded-2xl bg-slate-800 border border-indigo-400/50 flex items-center justify-center relative z-10 shadow-2xl">
+                <svg class="w-10 h-10 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                </svg>
+              </div>
+              <p class="text-[10px] text-center mt-3 text-indigo-300 font-mono tracking-widest">NEURAL_NODE</p>
+            </div>
+
+            <div class="flex-1 px-4 relative">
+              <div class="h-[2px] bg-gradient-to-r from-indigo-500 via-amber-400 to-emerald-500 w-full relative">
+                <div class="absolute -top-1 left-0 w-2 h-2 bg-white rounded-full animate-ping"></div>
+                <div class="absolute top-[-4px] left-1/4 w-1 h-1 bg-indigo-300 rounded-full animate-bounce"></div>
+                <div class="absolute top-[-2px] left-2/4 w-1 h-1 bg-amber-300 rounded-full animate-pulse"></div>
+                <div class="absolute top-[-6px] left-3/4 w-1.5 h-1.5 bg-emerald-300 rounded-full animate-bounce" style="animation-delay: 0.5s"></div>
+              </div>
+              <div class="text-[9px] text-slate-500 font-mono absolute -bottom-6 left-1/2 -translate-x-1/2 whitespace-nowrap">
+                BACKPROPAGATION_IN_PROGRESS (98.4%)
+              </div>
+            </div>
+
+            <div class="relative group">
+              <div class="absolute -inset-4 bg-emerald-500/20 rounded-full blur-xl group-hover:bg-emerald-500/40 transition-all"></div>
+              <div class="w-20 h-20 rounded-2xl bg-slate-800 border border-emerald-400/50 flex items-center justify-center relative z-10 shadow-2xl">
+                <svg class="w-10 h-10 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <p class="text-[10px] text-center mt-3 text-emerald-300 font-mono tracking-widest">CORE_ENGINE</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="w-full lg:w-1/2 space-y-4 text-left">
+          <h2 class="text-2xl font-bold text-white">Neuro-Arquitectura del Aprendizaje</h2>
+          <p class="text-slate-400 text-sm leading-relaxed">
+            Este laboratorio utiliza el concepto de <span class="text-indigo-400 font-semibold">Machine Learning Humano</span>: tratamos tu cerebro como un modelo estocástico que necesita datos limpios y retroalimentación inmediata. 
+          </p>
+          <div class="grid grid-cols-2 gap-4 mt-6">
+            <div class="p-4 bg-slate-800/50 rounded-xl border border-slate-700">
+              <div class="text-2xl font-bold text-indigo-400">${stats.retencion.gamificado}</div>
+              <div class="text-[10px] text-slate-500 uppercase tracking-tighter">Retención Cognitiva</div>
+            </div>
+            <div class="p-4 bg-slate-800/50 rounded-xl border border-slate-700">
+              <div class="text-2xl font-bold text-emerald-400">${stats.dopamina}</div>
+              <div class="text-[10px] text-slate-500 uppercase tracking-tighter">Engagement Sináptico</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 border-t border-slate-800 pt-8">
+        <div>
+          <h4 class="text-sm font-bold text-indigo-300 mb-4 flex items-center gap-2">
+            <span class="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>
+            ¿Por qué este método?
+          </h4>
+          <p class="text-xs text-slate-400 leading-relaxed">
+            Al igual que una IA optimiza su función de pérdida (Loss Function), el ser humano aprende mediante el error corregido en tiempo real. Estudiar de forma pasiva es como darle un dataset estático a una IA sin permitirle entrenar. Jugar es el **proceso de entrenamiento (Epochs)** donde cada error ajusta tus pesos neuronales.
+          </p>
+        </div>
+        <div>
+          <h4 class="text-sm font-bold text-emerald-300 mb-4 flex items-center gap-2">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+            Aplicación Profesional
+          </h4>
+          <p class="text-xs text-slate-400 leading-relaxed">
+            En el mundo laboral, no calculas integrales a mano; diseñas algoritmos que las usan. Dominar el cálculo desde la lógica de "patrones" te prepara para roles de **Data Scientist**, **ML Engineer** o **Arquitecto de Software**, donde la visión abstracta es más valiosa que la aritmética simple.
+          </p>
+        </div>
+      </div>
+    </div>
+
+
+
+    
+  `;
+    }
+
+
+
+    function subjectCardHTML({ title, emoji, desc, active, id }) {
+      if (active) {
+        return `
+          <button
+            data-id="${id}"
+            class="group glass-card rounded-3xl p-6 text-left transition-all duration-300 hover:scale-[1.03] hover:border-indigo-400/50 hover:shadow-[0_0_40px_rgba(99,102,241,0.3)] focus:outline-none focus:ring-2 focus:ring-indigo-400 animate-float"
+          >
+            <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-500 to-indigo-700 flex items-center justify-center text-2xl font-bold mb-4 shadow-lg shadow-indigo-900/50 group-hover:animate-pulse-glow">
+              ${emoji}
+            </div>
+            <h3 class="text-lg font-semibold text-slate-50 mb-1">${title}</h3>
+            <p class="text-sm text-slate-400">${desc}</p>
+            <div class="mt-4 inline-flex items-center gap-1.5 text-xs font-medium text-indigo-300">
+              Iniciar Quest
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+              </svg>
+            </div>
+          </button>
+        `;
+      }
+      return `
+        <div class="relative glass-card rounded-3xl p-6 opacity-50 grayscale cursor-not-allowed select-none">
+          <div class="w-14 h-14 rounded-2xl bg-slate-700 flex items-center justify-center text-2xl font-bold mb-4 text-slate-400">
+            ${emoji}
+          </div>
+          <h3 class="text-lg font-semibold text-slate-300 mb-1">${title}</h3>
+          <p class="text-sm text-slate-500">${desc}</p>
+          <div class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m0 0v2m0-2h2m-2 0h-2m6-6V7a4 4 0 00-8 0v4m-2 0h12a2 2 0 012 2v7a2 2 0 01-2 2H6a2 2 0 01-2-2v-7a2 2 0 012-2z" />
+            </svg>
+          </div>
+        </div>
+      `;
+    }
+
+    // ===== SCREEN: Instructions =====
+    function renderInstructions() {
+      const container = document.createElement('div');
+      container.className = 'min-h-screen flex items-center justify-center px-4 py-10';
+      container.innerHTML = `
+        <div class="max-w-2xl w-full animate-fade-in-scale">
+          <div class="glass rounded-4xl p-8 md:p-10 shadow-2xl">
+            <div class="flex items-center gap-3 mb-6">
+              <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-indigo-700 flex items-center justify-center text-xl font-bold shadow-lg">
+                ∫
+              </div>
+              <div>
+                <p class="text-xs uppercase tracking-widest text-indigo-300 font-medium">Cálculo Integral</p>
+                <h2 class="text-2xl font-bold text-slate-50">Reglas del juego</h2>
+              </div>
+            </div>
+
+            <ul class="space-y-4 mb-8">
+              <li class="flex gap-3">
+                <div class="shrink-0 w-8 h-8 rounded-full bg-indigo-500/20 text-indigo-300 flex items-center justify-center text-sm font-semibold">1</div>
+                <p class="text-slate-300 text-sm leading-relaxed">
+                  Responderás <strong class="text-slate-100">20 preguntas</strong> repartidas en 10 niveles de dificultad progresiva.
+                </p>
+              </li>
+              <li class="flex gap-3">
+                <div class="shrink-0 w-8 h-8 rounded-full bg-amber-500/20 text-amber-300 flex items-center justify-center text-sm font-semibold">2</div>
+                <p class="text-slate-300 text-sm leading-relaxed">
+                  Cada respuesta correcta te da <strong class="text-amber-300">+100 monedas</strong>. Las incorrectas restan <strong class="text-rose-300">50</strong>.
+                </p>
+              </li>
+              <li class="flex gap-3">
+                <div class="shrink-0 w-8 h-8 rounded-full bg-emerald-500/20 text-emerald-300 flex items-center justify-center text-sm font-semibold">3</div>
+                <p class="text-slate-300 text-sm leading-relaxed">
+                  Si fallas, verás la <strong class="text-emerald-300">respuesta correcta</strong> en verde junto con una pista útil.
+                </p>
+              </li>
+              <li class="flex gap-3">
+                <div class="shrink-0 w-8 h-8 rounded-full bg-indigo-500/20 text-indigo-300 flex items-center justify-center text-sm font-semibold">4</div>
+                <p class="text-slate-300 text-sm leading-relaxed">
+                  Mide tu tiempo y tu precisión en tiempo real en el panel lateral.
+                </p>
+              </li>
+            </ul>
+
+            <div class="flex flex-col sm:flex-row gap-3">
+              <button
+                id="btn-back"
+                class="flex-1 px-5 py-3 rounded-2xl glass-card text-slate-200 font-medium hover:bg-slate-800/50 transition-colors"
+              >
+                Volver
+              </button>
+              <button
+                id="btn-start"
+                class="flex-[2] px-5 py-3 rounded-2xl bg-gradient-to-r from-indigo-500 to-indigo-600 text-white font-semibold shadow-lg shadow-indigo-900/50 hover:shadow-indigo-500/40 hover:scale-[1.02] transition-all"
+              >
+                Comenzar Quest
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+      container.querySelector('#btn-back').addEventListener('click', () => setScreen('subjects'));
+      container.querySelector('#btn-start').addEventListener('click', startGame);
+      return container;
+    }
+
+    // ===== SCREEN: Game =====
+    function renderGame() {
+      const q = state.questions[state.currentIndex];
+      const total = state.questions.length;
+      const progress = ((state.currentIndex + (state.showingFeedback ? 1 : 0)) / total) * 100;
+
+      const container = document.createElement('div');
+      container.className = 'min-h-screen px-4 py-6 md:py-10';
+      container.innerHTML = `
+        <div class="max-w-7xl mx-auto">
+          <!-- Header -->
+          <header class="glass rounded-3xl px-5 py-4 mb-6 flex flex-wrap items-center gap-4">
+            <button id="btn-exit" class="shrink-0 w-10 h-10 rounded-xl bg-slate-800/70 hover:bg-slate-700/70 flex items-center justify-center transition-colors" aria-label="Salir">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              </svg>
+            </button>
+
+            <div class="flex-1 min-w-[180px]">
+              <div class="flex justify-between items-center text-xs text-slate-400 mb-1.5">
+                <span class="font-medium">Pregunta ${state.currentIndex + 1} / ${total}</span>
+                <span class="font-medium text-indigo-300">Nivel ${q.level}</span>
+              </div>
+              <div class="h-2 rounded-full bg-slate-800 overflow-hidden">
+                <div class="h-full bg-gradient-to-r from-indigo-500 to-indigo-400 transition-all duration-500" style="width:${progress}%"></div>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2 px-3 py-2 rounded-xl bg-amber-500/10 border border-amber-500/20">
+              <span class="text-xl">🪙</span>
+              <span class="font-bold text-amber-300 tabular-nums">${state.coins}</span>
+            </div>
+
+            <div class="flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-800/70 border border-slate-700/50">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span id="timer-display" class="font-mono font-semibold text-slate-200 tabular-nums">${formatTime(state.time)}</span>
+            </div>
+          </header>
+
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Question Panel -->
+            <div class="lg:col-span-2 glass rounded-3xl p-6 md:p-8 ${state.showingFeedback && !state.isCorrect ? 'animate-shake' : 'animate-slide-in'}">
+              <p class="text-sm text-indigo-300 uppercase tracking-widest font-medium mb-3">${q.question}</p>
+
+              <div class="flex items-center justify-center py-8 px-4 rounded-2xl bg-slate-900/60 border border-slate-700/50 mb-6 min-h-[140px]">
+                <div data-latex="question" data-tex="${escapeAttr(q.latex)}" class="text-slate-50 text-3xl md:text-4xl"></div>
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                ${q.options.map((opt, idx) => optionHTML(opt, idx, q.correctIndex)).join('')}
+              </div>
+
+              ${state.showingFeedback && !state.isCorrect ? hintHTML(q.hint) : ''}
+            </div>
+
+            <!-- Sidebar: Precision -->
+            <aside class="space-y-6">
+              <div class="glass rounded-3xl p-6">
+                <h3 class="text-sm font-semibold uppercase tracking-widest text-slate-400 mb-4">Precisión</h3>
+                <div class="relative flex items-center justify-center">
+                  <canvas id="precisionChart" width="200" height="200"></canvas>
+                  <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                    <span class="text-3xl font-bold text-slate-50 tabular-nums">
+                      ${state.correct + state.incorrect === 0 ? '0' : Math.round((state.correct / (state.correct + state.incorrect)) * 100)}%
+                    </span>
+                    <span class="text-xs text-slate-400 mt-1">Acierto</span>
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3 mt-6">
+                  <div class="rounded-2xl bg-emerald-500/10 border border-emerald-500/20 p-3 text-center">
+                    <div class="text-2xl font-bold text-emerald-300 tabular-nums">${state.correct}</div>
+                    <div class="text-xs text-slate-400 mt-0.5">Correctas</div>
+                  </div>
+                  <div class="rounded-2xl bg-rose-500/10 border border-rose-500/20 p-3 text-center">
+                    <div class="text-2xl font-bold text-rose-300 tabular-nums">${state.incorrect}</div>
+                    <div class="text-xs text-slate-400 mt-0.5">Incorrectas</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="glass-card rounded-3xl p-5">
+                <p class="text-xs text-slate-400 uppercase tracking-widest font-medium mb-2">Tip</p>
+                <p class="text-sm text-slate-300 leading-relaxed">
+                  Recuerda siempre agregar la constante de integración <strong class="text-indigo-300">+ C</strong> en las integrales indefinidas.
+                </p>
+              </div>
+            </aside>
+          </div>
+        </div>
+      `;
+
+
+
+      container.querySelector('#btn-exit').addEventListener('click', showExitAlert);
+
+      return container;
+    }
+
+    function optionHTML(opt, idx, correctIdx) {
+      const letters = ['A', 'B', 'C', 'D'];
+      let classes = 'glass-card border-slate-700/50 hover:border-indigo-400/60 hover:bg-slate-800/60';
+      let ring = '';
+      const disabled = state.showingFeedback;
+
+      if (state.showingFeedback) {
+        if (idx === correctIdx) {
+          classes = 'bg-emerald-500/15 border-emerald-400/60 text-emerald-100';
+          ring = 'ring-2 ring-emerald-400/60';
+        } else if (idx === state.selected) {
+          classes = 'bg-rose-500/15 border-rose-400/60 text-rose-100';
+          ring = 'ring-2 ring-rose-400/60';
+        } else {
+          classes = 'glass-card border-slate-700/30 opacity-50';
+        }
+      }
+
+      return `
+        <button
+          data-option-idx="${idx}"
+          ${disabled ? 'disabled' : ''}
+          class="group flex items-center gap-3 text-left px-4 py-4 rounded-2xl border transition-all duration-200 ${classes} ${ring} ${disabled ? 'cursor-not-allowed' : 'hover:scale-[1.02]'}"
+        >
+          <span class="shrink-0 w-9 h-9 rounded-xl bg-slate-900/50 border border-slate-700/50 flex items-center justify-center text-sm font-bold text-slate-300 group-hover:border-indigo-400/50 group-hover:text-indigo-300 transition-colors">
+            ${letters[idx]}
+          </span>
+          <span data-latex="option" data-tex="${escapeAttr(opt)}" class="flex-1 text-slate-100 text-base"></span>
+        </button>
+      `;
+    }
+
+    function hintHTML(hint) {
+      return `
+        <div class="mt-5 flex gap-3 p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 animate-slide-in">
+          <div class="shrink-0 w-8 h-8 rounded-lg bg-amber-500/20 flex items-center justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-amber-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <div>
+            <p class="text-xs font-semibold uppercase tracking-widest text-amber-300 mb-1">Pista</p>
+            <p class="text-sm text-amber-100/90 leading-relaxed">${hint}</p>
+          </div>
+        </div>
+      `;
+    }
+
+    function setupChart() {
+      const canvas = document.getElementById('precisionChart');
+      if (!canvas || !window.Chart) return;
+      if (chartInstance) {
+        chartInstance.destroy();
+      }
+      const total = state.correct + state.incorrect;
+      const data = total === 0 ? [1] : [state.correct, state.incorrect];
+      const colors = total === 0 ? ['#1e293b'] : ['#10b981', '#f43f5e'];
+
+      chartInstance = new window.Chart(canvas, {
+        type: 'doughnut',
+        data: {
+          labels: total === 0 ? ['Sin datos'] : ['Correctas', 'Incorrectas'],
+          datasets: [{
+            data,
+            backgroundColor: colors,
+            borderColor: 'rgba(15,23,42,0.8)',
+            borderWidth: 3,
+            hoverOffset: 6,
+          }],
+        },
+        options: {
+          cutout: '72%',
+          responsive: false,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              enabled: total !== 0,
+              backgroundColor: 'rgba(15,23,42,0.95)',
+              borderColor: 'rgba(99,102,241,0.4)',
+              borderWidth: 1,
+              titleColor: '#f1f5f9',
+              bodyColor: '#cbd5e1',
+            },
+          },
+          animation: { animateRotate: true, duration: 500 },
+        },
+      });
+    }
+
+    // ===== SCREEN: Results =====
+    function renderResults() {
+      const total = state.questions.length;
+      const precision = total === 0 ? 0 : Math.round((state.correct / total) * 100);
+      let verdict, color, icon;
+      if (precision >= 80) {
+        verdict = '¡Maestro Integral!';
+        color = 'emerald';
+        icon = '🏆';
+      } else if (precision >= 60) {
+        verdict = '¡Buen trabajo!';
+        color = 'indigo';
+        icon = '⭐';
+      } else if (precision >= 40) {
+        verdict = 'Sigue practicando';
+        color = 'amber';
+        icon = '💪';
+      } else {
+        verdict = '¡Vuelve a intentarlo!';
+        color = 'rose';
+        icon = '📚';
+      }
+
+      const container = document.createElement('div');
+      container.className = 'min-h-screen flex items-center justify-center px-4 py-10';
+      container.innerHTML = `
+        <div class="max-w-2xl w-full animate-fade-in-scale">
+          <div class="glass rounded-4xl p-8 md:p-10 shadow-2xl text-center">
+            <div class="w-20 h-20 mx-auto mb-5 rounded-3xl bg-gradient-to-br from-${color}-500 to-${color}-700 flex items-center justify-center text-4xl shadow-2xl shadow-${color}-900/50">
+              ${icon}
+            </div>
+            <p class="text-xs uppercase tracking-widest text-${color}-300 font-medium mb-2">Quest completada</p>
+            <h2 class="text-3xl md:text-4xl font-bold text-slate-50 mb-8 text-balance">${verdict}</h2>
+
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
+              <div class="rounded-2xl glass-card p-4">
+                <div class="text-2xl font-bold text-amber-300 tabular-nums">${state.coins}</div>
+                <div class="text-xs text-slate-400 mt-1">Monedas</div>
+              </div>
+              <div class="rounded-2xl glass-card p-4">
+                <div class="text-2xl font-bold text-indigo-300 tabular-nums">${precision}%</div>
+                <div class="text-xs text-slate-400 mt-1">Precisión</div>
+              </div>
+              <div class="rounded-2xl glass-card p-4">
+                <div class="text-2xl font-bold text-emerald-300 tabular-nums">${state.correct}/${total}</div>
+                <div class="text-xs text-slate-400 mt-1">Aciertos</div>
+              </div>
+              <div class="rounded-2xl glass-card p-4">
+                <div class="text-2xl font-bold text-slate-200 tabular-nums">${formatTime(state.time)}</div>
+                <div class="text-xs text-slate-400 mt-1">Tiempo</div>
+              </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row gap-3">
+              <button id="btn-home" class="flex-1 px-5 py-3 rounded-2xl glass-card text-slate-200 font-medium hover:bg-slate-800/50 transition-colors">
+                Inicio
+              </button>
+              <button id="btn-replay" class="flex-[2] px-5 py-3 rounded-2xl bg-gradient-to-r from-indigo-500 to-indigo-600 text-white font-semibold shadow-lg shadow-indigo-900/50 hover:scale-[1.02] transition-all">
+                Jugar de nuevo
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+      container.querySelector('#btn-home').addEventListener('click', resetGame);
+      container.querySelector('#btn-replay').addEventListener('click', startGame);
+      return container;
+    }
+
+    // ===== Helpers =====
+    function escapeAttr(str) {
+      return String(str).replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+
+
+    const showExitAlert = () => {
+      // 1. Crear el elemento contenedor
+      const alertOverlay = document.createElement('div');
+      alertOverlay.className = 'fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-[9999] flex items-center justify-center p-4 opacity-0 transition-opacity duration-300';
+
+      // 2. Inyectar el HTML con Tailwind
+      alertOverlay.innerHTML = `
+    <div id="alert-card" class="bg-white rounded-2xl shadow-2xl max-w-sm w-full transform scale-90 transition-transform duration-300 overflow-hidden">
+      <div class="p-6 text-center">
+        <div class="inline-flex items-center justify-center w-16 h-16 mb-4 bg-red-50 rounded-full">
+          <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+          </svg>
+        </div>
+        <h3 class="text-xl font-bold text-gray-900 mb-2">¿Abandonar laboratorio?</h3>
+        <p class="text-gray-500">Si sales ahora, perderás todo el progreso y los cálculos realizados hasta el momento.</p>
+      </div>
+      <div class="flex border-t border-gray-100">
+        <button id="cancel-btn" class="flex-1 px-6 py-4 text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-colors">
+          CANCELAR
+        </button>
+        <button id="confirm-btn" class="flex-1 px-6 py-4 text-sm font-semibold text-white bg-red-600 hover:bg-red-700 transition-colors">
+          SALIR
+        </button>
+      </div>
+    </div>
+  `;
+
+      document.body.appendChild(alertOverlay);
+
+      // 3. Animación de entrada
+      setTimeout(() => {
+        alertOverlay.classList.remove('opacity-0');
+        alertOverlay.querySelector('#alert-card').classList.remove('scale-90');
+        alertOverlay.querySelector('#alert-card').classList.add('scale-100');
+      }, 10);
+
+      // 4. Lógica de cierre
+      const close = (callback) => {
+        alertOverlay.classList.add('opacity-0');
+        alertOverlay.querySelector('#alert-card').classList.replace('scale-100', 'scale-90');
+        setTimeout(() => {
+          alertOverlay.remove();
+          if (callback) callback();
+        }, 300);
+      };
+
+      // Eventos
+      alertOverlay.querySelector('#confirm-btn').addEventListener('click', () => {
+        close(() => resetGame());
+      });
+
+      alertOverlay.querySelector('#cancel-btn').addEventListener('click', () => {
+        close();
+      });
+    };
+
+    // ===== Boot =====
+    // Wait until KaTeX loads (script is deferred) to ensure rendering works
+    window.addEventListener('load', () => {
+      render();
+    });
+  </script>
+</body>
+
+</html>
