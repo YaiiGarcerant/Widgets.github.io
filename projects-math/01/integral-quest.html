@@ -408,15 +408,14 @@
         state.incorrect += 1;
       }
 
-      render(); // Muestra el feedback (rojo/verde)
-
-      // Bajamos el delay de error de 3000 a 2000 o 1500
-      const delay = isCorrect ? 1000 : 2000;
-
-      setTimeout(() => {
-        // Si quieres eliminar el lag visual, podrías añadir una clase de "fade-out" aquí
+      if (isCorrect) {
+        // Respuesta correcta: avanza directo sin re-renderizar
         nextQuestion();
-      }, delay);
+      } else {
+        // Respuesta incorrecta: muestra feedback rojo + pista, luego avanza
+        render();
+        setTimeout(() => nextQuestion(), 2000);
+      }
     }
 
     function nextQuestion() {
@@ -444,13 +443,6 @@
     // ===== RENDER =====
     function render() {
       const app = document.getElementById('app');
-
-      // Si ya estamos en el juego, no vacíes TODO el app, 
-      // solo actualiza los componentes internos.
-      if (state.screen === 'game' && document.querySelector('.game-container')) {
-        updateGameUI(); // Una función que solo cambie textos y anchos
-        return;
-      }
 
       app.innerHTML = '';
 
@@ -863,6 +855,14 @@
 
 
       container.querySelector('#btn-exit').addEventListener('click', showExitAlert);
+
+      // Attach click listeners to answer options
+      container.querySelectorAll('[data-option-idx]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const idx = parseInt(btn.getAttribute('data-option-idx'), 10);
+          answerQuestion(idx);
+        });
+      });
 
       return container;
     }
