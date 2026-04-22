@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Integral Master Quiz</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+</head>
+<body class="bg-slate-100 min-h-screen flex items-center justify-center p-4">
+
+    <div id="app" class="max-w-2xl w-full bg-white rounded-2xl shadow-xl overflow-hidden">
+        
+        <div id="start-screen" class="p-8 text-center">
+            <div class="mb-6">
+                <h1 class="text-4xl font-extrabold text-indigo-700 mb-2">Integral Master</h1>
+                <p class="text-slate-500">Domina integrales definidas, indefinidas y trigonométricas.</p>
+            </div>
+            <div class="bg-indigo-50 p-6 rounded-xl mb-8 border border-indigo-100">
+                <h3 class="font-bold text-indigo-800 mb-2">Reglas del Juego</h3>
+                <ul class="text-sm text-indigo-700 space-y-1">
+                    <li>• Se seleccionarán 20 integrales al azar.</li>
+                    <li>• No hay límite de tiempo, ¡concéntrate!</li>
+                    <li>• Al final obtendrás tu calificación detallada.</li>
+                </ul>
+            </div>
+            <button onclick="initGame()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 rounded-xl transition-all transform hover:scale-[1.02]">
+                ¡Comenzar Reto!
+            </button>
+        </div>
+
+        <div id="game-screen" class="hidden p-8">
+            <div class="flex justify-between items-center mb-6">
+                <span id="counter" class="text-indigo-600 font-bold bg-indigo-50 px-4 py-1 rounded-full text-sm">Pregunta 1/20</span>
+                <span id="score-live" class="text-emerald-600 font-bold text-sm">Aciertos: 0</span>
+            </div>
+
+            <div class="w-full bg-slate-200 h-2 rounded-full mb-8">
+                <div id="progress-bar" class="bg-indigo-600 h-2 rounded-full transition-all duration-300" style="width: 5%"></div>
+            </div>
+
+            <div class="bg-slate-50 p-8 rounded-2xl border border-slate-200 mb-8 flex justify-center items-center min-h-[150px]">
+                <div id="math-question" class="text-3xl text-slate-800"></div>
+            </div>
+
+            <div id="options-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                </div>
+        </div>
+
+        <div id="result-screen" class="hidden p-8 text-center">
+            <h2 class="text-3xl font-bold text-slate-800 mb-2">¡Completado!</h2>
+            <div class="text-7xl font-black text-indigo-600 my-8" id="final-score-text">0/20</div>
+            <p id="feedback-message" class="text-slate-600 mb-8 font-medium"></p>
+            <button onclick="location.reload()" class="bg-slate-800 hover:bg-black text-white px-8 py-3 rounded-xl transition">
+                Intentar de Nuevo
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // BASE DE DATOS (Simulación de 100 preguntas, aquí pongo ejemplos variados)
+        const dbIntegrales = [
+            { q: "\\int x^2 \\, dx", a: ["\\frac{x^3}{3} + C", "2x + C", "\\frac{x^2}{2} + C", "x^3 + C"], c: "\\frac{x^3}{3} + C" },
+            { q: "\\int_{0}^{1} x \\, dx", a: ["1", "0.5", "2", "0"], c: "0.5" },
+            { q: "\\int \\cos(x) \\, dx", a: ["\\sin(x) + C", "-\\sin(x) + C", "\\tan(x) + C", "\\cos^2(x) + C"], c: "\\sin(x) + C" },
+            { q: "\\int e^x \\, dx", a: ["e^x + C", "xe^{x-1} + C", "\\ln(x) + C", "e^{2x} + C"], c: "e^x + C" },
+            { q: "\\int_{1}^{2} 2x \\, dx", a: ["3", "4", "2", "5"], c: "3" },
+            { q: "\\int \\sec^2(x) \\, dx", a: ["\\tan(x) + C", "\\cot(x) + C", "\\sin(x) + C", "\\cos(x) + C"], c: "\\tan(x) + C" },
+            { q: "\\int \\frac{1}{x} \\, dx", a: ["\\ln|x| + C", "e^x + C", "x^{-2} + C", "\\ln(2x) + C"], c: "\\ln|x| + C" },
+            { q: "\\int \\sin(x) \\, dx", a: ["-\\cos(x) + C", "\\cos(x) + C", "\\sin(x) + C", "0"], c: "-\\cos(x) + C" }
+            // ... Agrega aquí el resto hasta completar las 100 siguiendo el mismo formato
+        ];
+
+        let selectedQuestions = [];
+        let currentIndex = 0;
+        let score = 0;
+
+        function initGame() {
+            // Seleccionar 20 al azar
+            selectedQuestions = [...dbIntegrales]
+                .sort(() => Math.random() - 0.5)
+                .slice(0, 20);
+            
+            currentIndex = 0;
+            score = 0;
+
+            document.getElementById('start-screen').classList.add('hidden');
+            document.getElementById('game-screen').classList.remove('hidden');
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            const data = selectedQuestions[currentIndex];
+            
+            // Actualizar textos y barra
+            document.getElementById('counter').innerText = `Pregunta ${currentIndex + 1}/20`;
+            document.getElementById('progress-bar').style.width = `${((currentIndex + 1) / 20) * 100}%`;
+            
+            // Renderizar pregunta con KaTeX
+            const mathContainer = document.getElementById('math-question');
+            katex.render(data.q, mathContainer, { throwOnError: false });
+
+            // Generar botones de opciones
+            const grid = document.getElementById('options-grid');
+            grid.innerHTML = '';
+            
+            // Mezclar opciones
+            const options = [...data.a].sort(() => Math.random() - 0.5);
+
+            options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = "p-4 text-center border-2 border-slate-200 rounded-xl hover:border-indigo-500 hover:bg-indigo-50 transition-all text-lg";
+                
+                // Renderizar opción con KaTeX
+                const span = document.createElement('span');
+                katex.render(opt, span, { throwOnError: false });
+                btn.appendChild(span);
+
+                btn.onclick = () => checkAnswer(opt, data.c);
+                grid.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(selected, correct) {
+            if (selected === correct) {
+                score++;
+                document.getElementById('score-live').innerText = `Aciertos: ${score}`;
+            }
+
+            currentIndex++;
+            if (currentIndex < 20 && currentIndex < selectedQuestions.length) {
+                loadQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function showResults() {
+            document.getElementById('game-screen').classList.add('hidden');
+            document.getElementById('result-screen').classList.remove('hidden');
+            document.getElementById('final-score-text').innerText = `${score}/20`;
+            
+            const msg = document.getElementById('feedback-message');
+            if (score === 20) msg.innerText = "¡Eres una leyenda del cálculo!";
+            else if (score > 15) msg.innerText = "¡Excelente dominio de las integrales!";
+            else if (score > 10) msg.innerText = "Buen esfuerzo, pero necesitas practicar más.";
+            else msg.innerText = "Te recomiendo repasar las reglas de integración.";
+        }
+    </script>
+</body>
+</html>
